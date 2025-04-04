@@ -6,6 +6,9 @@ Louise Christophe, Eudocie de Khovrine, Marine Fraboulet
 
 ### Description  
 Ce projet est un jeu tetris que lequel l'IA va s'entrainer pour devenir plus efficace.
+idée deep learning:
+s'entrainer sur des modeles: analyse des decisions de parties = retenir le placement du pixel
+coef associées aux actions
 
 
 ### Structure du Projet
@@ -56,3 +59,5 @@ python main.py
 
 ### Licence
 Ce projet est sous licence MIT.
+
+
