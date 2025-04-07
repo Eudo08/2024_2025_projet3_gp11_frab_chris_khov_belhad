@@ -2,12 +2,14 @@
 Louise Christophe, Eudocie de Khovrine, Marine Fraboulet
 
 ## Tetris
+Jeu ayant pour objectif de remplir des lignes; des formes géométiques descendent et le joueur doit les placer de façon à remplir l'espace le plus efficassement possible.
+Plus le joueur rempli des lignes, plus il gagne des points.
 
 
 ### Description  
-Ce projet est un jeu tetris que lequel l'IA va s'entrainer pour devenir plus efficace.
-idée deep learning:
-s'entrainer sur des modeles: analyse des decisions de parties = retenir le placement du pixel
+Ce projet est un jeu tetris avec lequel l'IA va s'entrainer pour devenir plus efficace.
+Idée deep learning:
+S'entrainer sur des modeles: analyse des decisions de parties = retenir le placement du pixel
 coef associées aux actions
 
 
