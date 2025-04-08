@@ -11,6 +11,37 @@ taille_bloc = 25
 origine_x = 330
 origine_y = 0
 
+grid = []
+grid_height = 20
+grid_width = 10
+grid_cellsize = 0
+grid_cells = []
+grid_centerX = 0
+grid_centerY = 0
+
+def init_grid():
+    global grid_cellsize, grid_cells, grid_centerX, grid_centerY
+    h = hauteur / grid_height
+    grid_cellsize = h
+    grid_centerX = (largeur / 2) - (h * grid_width) / 2
+    grid_centerY = 0
+
+    grid_cells = []
+    for i in range(grid_height):
+        row = []
+        for j in range(grid_width):
+            row.append(0)
+        grid_cells.append(row)
+
+def draw_grid():
+    h = grid_cellsize
+    w = h
+    for i in range(grid_height):
+        for j in range(grid_width):
+            x = grid_centerX + j * w
+            y = grid_centerY + i * h
+            pygame.draw.rect(fenetre, BLANC, (x, y, w, h), 1)
+
 # Couleurs
 NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)

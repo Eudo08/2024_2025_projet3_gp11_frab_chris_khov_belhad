@@ -147,12 +147,14 @@ clock = pygame.time.Clock()
 fps = 25
 game = Tetris(20, 10)
 counter = 0
-
+ai_made_move = False
 pressing_down = False
+
 
 while not done:
     if game.figure is None:
         game.new_figure()
+        ai_made_move = False
     counter += 1
     if counter > 100000:
         counter = 0
@@ -160,27 +162,38 @@ while not done:
     if counter % (fps // game.level // 2) == 0 or pressing_down:
         if game.state == "start":
             game.go_down()
+    
+    if not ai_made_move:
+        rotation = random.randint (1,4)
+        collone = random.randint (-5,5)
+        game.go_side(collone)
+        for i in range (rotation):
+            game.rotate ()
+        ai_made_move = True
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                game.rotate()
-            if event.key == pygame.K_DOWN:
-                pressing_down = True
-            if event.key == pygame.K_LEFT:
-                game.go_side(-1)
-            if event.key == pygame.K_RIGHT:
-                game.go_side(1)
-            if event.key == pygame.K_SPACE:
-                game.go_space()
-            if event.key == pygame.K_ESCAPE:
-                game.__init__(20, 10)
 
-    if event.type == pygame.KEYUP:
-            if event.key == pygame.K_DOWN:
-                pressing_down = False
+    # for event in pygame.event.get():
+        # if event.type == pygame.QUIT:
+        #     done = True
+        # if event.type == pygame.KEYDOWN:
+        #     if event.key == pygame.K_UP:
+        #         game.rotate()
+        #     if event.key == pygame.K_DOWN:
+        #         pressing_down = True
+        #     if event.key == pygame.K_LEFT:
+        #         game.go_side(-1)
+        #     if event.key == pygame.K_RIGHT:
+        #         game.go_side(1)
+        #     if event.key == pygame.K_SPACE:
+        #         game.go_space()
+        #     if event.key == pygame.K_ESCAPE:
+        #         game.__init__(20, 10)
+        # def IA_generate_random ():
+
+
+    # if event.type == pygame.KEYUP:
+    #         if event.key == pygame.K_DOWN:
+    #             pressing_down = False
 
     screen.fill(WHITE)
 
