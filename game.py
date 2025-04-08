@@ -163,7 +163,7 @@ while not done:
         if game.state == "start":
             game.go_down()
     
-    if not ai_made_move:
+    if game.state == "start" and not ai_made_move:
         rotation = random.randint (1,4)
         collone = random.randint (-5,5)
         game.go_side(collone)
