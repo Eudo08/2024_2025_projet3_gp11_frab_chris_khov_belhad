@@ -8,8 +8,7 @@ pygame.init()
 largeur = 800
 hauteur = 600
 taille_bloc = 25
-origine_x = 330
-origine_y = 0
+
 
 grid = []
 grid_height = 20
@@ -71,7 +70,9 @@ pygame.display.set_caption("Tetris")
 
 en_cours = True
 clock = pygame.time.Clock()
-
+init_grid()
+origine_x = grid_centerX
+origine_y = grid_centerY
 while en_cours:
     for evenement in pygame.event.get():
         if evenement.type == pygame.QUIT:
@@ -88,6 +89,7 @@ while en_cours:
 
 
     fenetre.fill(NOIR)
+    draw_grid()
     dessiner_piece(piece_id, rotation, origine_x, origine_y)
 
     pygame.display.flip()
