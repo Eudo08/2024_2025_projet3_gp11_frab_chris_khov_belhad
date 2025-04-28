@@ -79,7 +79,38 @@ def next_drop(dt):
         piece_pos_y += 1
         timerdrop = gravity_time  
 
+# def nouv_tetros () :
+#     if piece_pos_y >= grid_height - 4:  
+#         piece_pos_y = grid_height - 4
+#         nouvelle_piece()
+def nouv_tetros():
+    global piece_pos_x, piece_pos_y, grid_cells
 
+    piece = pieces.tetros[piece_id]["rotations"][rotation]
+    
+    # Vérifier si la pièce est en bas ou bloquée
+    for i in range(4):
+        for j in range(4):
+            if piece[i][j]:  # Si le bloc est actif
+                grid_y = piece_pos_y + i
+                grid_x = piece_pos_x + j
+
+                # Si la pièce atteint le bas ou entre en collision
+                if grid_y >= grid_height or (grid_y >= 0 and grid_cells[grid_y][grid_x] != 0):
+                    # Ajouter la pièce à la grille
+                    for k in range(4):
+                        for l in range(4):
+                            if piece[k][l]:  # Si le bloc est actif
+                                grid_y = piece_pos_y + k
+                                grid_x = piece_pos_x + l
+                                if grid_y >= 0:  # Ne pas ajouter les blocs hors de la grille
+                                    grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+                    
+                    # Générer une nouvelle pièce
+                    piece_pos_x = grid_width // 2 - 2
+                    piece_pos_y = 0
+                    nouvelle_piece()
+                    return
 
 fenetre = pygame.display.set_mode((largeur, hauteur))
 pygame.display.set_caption("Tetris")
@@ -124,11 +155,14 @@ while en_cours:
 
     fenetre.fill(NOIR)
     draw_grid()
+
+    nouv_tetros()
+    
     dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
 
     dt = clock.tick(30) 
     next_drop(dt)
 
     pygame.display.flip()
-    clock.tick(1)
+    clock.tick(5)
 pygame.quit ()
