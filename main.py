@@ -18,7 +18,9 @@ grid_cells = []
 grid_centerX = 0
 grid_centerY = 0
 piece_pos_x = grid_width // 2 - 2
-piece_pos_y = 0
+piece_pos_y = -1
+gravity_time = 1
+timerdrop = gravity_time
 
 def init_grid():
     global grid_cellsize, grid_cells, grid_centerX, grid_centerY
@@ -70,6 +72,15 @@ def dessiner_piece(piece_id, rotation, case_x, case_y):
 
 
 
+def next_drop(dt):
+    global timerdrop, piece_pos_y
+    timerdrop -= dt
+    if timerdrop <= 0:
+        piece_pos_y += 1
+        timerdrop = gravity_time  
+
+
+
 fenetre = pygame.display.set_mode((largeur, hauteur))
 pygame.display.set_caption("Tetris")
 
@@ -89,6 +100,21 @@ while en_cours:
                 rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
             elif evenement.key == pygame.K_ESCAPE:
                 en_cours = False
+            elif evenement.key == pygame.K_LEFT:
+                piece_pos_x -= 1
+                if piece_pos_x < 0:
+                    piece_pos_x = 0
+                                
+            elif evenement.key == pygame.K_RIGHT:
+                piece_pos_x += 1
+                piece = pieces.tetros[piece_id]["rotations"][rotation]
+                largeur_piece = 0
+                for j in range(4):
+                    for i in range(4):
+                        if piece[i][j]:
+                            largeur_piece = max(largeur_piece, j + 1)
+                if piece_pos_x > grid_width - largeur_piece:
+                    piece_pos_x = grid_width - largeur_piece
 
 
 
@@ -97,6 +123,9 @@ while en_cours:
     draw_grid()
     dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
 
+    dt = clock.tick(30) 
+    next_drop(dt)
+
     pygame.display.flip()
-    clock.tick(30)
+    clock.tick(3)
 pygame.quit ()
