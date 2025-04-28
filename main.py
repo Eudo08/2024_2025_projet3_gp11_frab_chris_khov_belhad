@@ -17,6 +17,8 @@ grid_cellsize = 0
 grid_cells = []
 grid_centerX = 0
 grid_centerY = 0
+piece_pos_x = grid_width // 2 - 2
+piece_pos_y = 0
 
 def init_grid():
     global grid_cellsize, grid_cells, grid_centerX, grid_centerY
@@ -55,14 +57,17 @@ def nouvelle_piece():
     piece_id = random.choice(list(pieces.tetros.keys()))
     rotation = 0
 
-def dessiner_piece(piece_id, rotation, x, y):
+def dessiner_piece(piece_id, rotation, case_x, case_y):
     piece = pieces.tetros[piece_id]["rotations"][rotation]
     couleur = pieces.tetros[piece_id]["couleur"]
     for i in range(4):
         for j in range(4):
             if piece[i][j]:
-                pygame.draw.rect(fenetre, couleur, (x + j * taille_bloc, y + i * taille_bloc, taille_bloc, taille_bloc))
-                pygame.draw.rect(fenetre, GRIS, (x + j * taille_bloc, y + i * taille_bloc, taille_bloc, taille_bloc), 1)
+                x= grid_centerX + (case_x + j) * grid_cellsize
+                y= grid_centerY + (case_y + i) * grid_cellsize
+                pygame.draw.rect(fenetre, couleur, (x, y, grid_cellsize, grid_cellsize))
+                pygame.draw.rect(fenetre, GRIS, (x, y, grid_cellsize, grid_cellsize), 1)
+
 
 
 fenetre = pygame.display.set_mode((largeur, hauteur))
@@ -90,7 +95,7 @@ while en_cours:
 
     fenetre.fill(NOIR)
     draw_grid()
-    dessiner_piece(piece_id, rotation, origine_x, origine_y)
+    dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
 
     pygame.display.flip()
     clock.tick(30)
