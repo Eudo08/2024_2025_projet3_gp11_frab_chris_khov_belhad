@@ -102,19 +102,22 @@ while en_cours:
                 en_cours = False
             elif evenement.key == pygame.K_LEFT:
                 piece_pos_x -= 1
-                if piece_pos_x < 0:
-                    piece_pos_x = 0
-                                
+                piece = pieces.tetros[piece_id]["rotations"][rotation]
+                for i in range(4):
+                    for j in range(4):
+                        if piece[i][j]:  
+                            if piece_pos_x + j < 0: 
+                                piece_pos_x += 1  
+                                break
             elif evenement.key == pygame.K_RIGHT:
                 piece_pos_x += 1
                 piece = pieces.tetros[piece_id]["rotations"][rotation]
-                largeur_piece = 0
-                for j in range(4):
-                    for i in range(4):
-                        if piece[i][j]:
-                            largeur_piece = max(largeur_piece, j + 1)
-                if piece_pos_x > grid_width - largeur_piece:
-                    piece_pos_x = grid_width - largeur_piece
+                for i in range(4):
+                    for j in range(4):
+                        if piece[i][j]:  
+                            if piece_pos_x + j >= grid_width:  
+                                piece_pos_x -= 1  
+                                break
 
 
 
@@ -127,5 +130,5 @@ while en_cours:
     next_drop(dt)
 
     pygame.display.flip()
-    clock.tick(3)
+    clock.tick(1)
 pygame.quit ()
