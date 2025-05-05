@@ -45,6 +45,16 @@ def draw_grid():
             y = grid_centerY + i * h
             pygame.draw.rect(fenetre, BLANC, (x, y, w, h), 1)
 
+def draw_locked_cells():
+    for i in range(grid_height):
+        for j in range(grid_width):
+            if grid_cells[i][j] != 0:
+                x = grid_centerX + j * grid_cellsize
+                y = grid_centerY + i * grid_cellsize
+                couleur = grid_cells[i][j]
+                pygame.draw.rect(fenetre, couleur, (x, y, grid_cellsize, grid_cellsize))
+                pygame.draw.rect(fenetre, GRIS, (x, y, grid_cellsize, grid_cellsize), 1)
+
 # Couleurs
 NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)
@@ -58,6 +68,9 @@ def nouvelle_piece():
     global piece_id, rotation
     piece_id = random.choice(list(pieces.tetros.keys()))
     rotation = 0
+
+
+
 
 def dessiner_piece(piece_id, rotation, case_x, case_y):
     piece = pieces.tetros[piece_id]["rotations"][rotation]
@@ -158,7 +171,7 @@ while en_cours:
     draw_grid()
 
     nouv_tetros()
-    
+    draw_locked_cells()
     dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
 
     dt = clock.tick(30) 
