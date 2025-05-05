@@ -21,9 +21,9 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     
-    ecran.fill(BLEU_FONCE)
+    ecran.fill(NOIR)
 
-    texte = font.render("TETRIS", True, NOIR)
+    texte = font.render("TETRIS", True, BLANC)
     texte_rect = texte.get_rect(center=player_pos)
     ecran.blit(texte, texte_rect)
 
