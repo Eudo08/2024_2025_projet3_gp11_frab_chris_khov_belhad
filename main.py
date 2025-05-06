@@ -8,8 +8,8 @@ pygame.init()
 largeur = 800
 hauteur = 600
 taille_bloc = 25
-
-
+score = 0
+font = pygame.font.SysFont("Arial", 30)
 grid = []
 grid_height = 20
 grid_width = 10
@@ -86,7 +86,7 @@ def dessiner_piece(piece_id, rotation, case_x, case_y):
 
 
 def next_drop(dt):
-    global timerdrop, piece_pos_y, piece_pos_x
+    global timerdrop, piece_pos_y, piece_pos_x, score
 
     timerdrop -= dt
     if timerdrop <= 0:
@@ -115,6 +115,9 @@ def next_drop(dt):
                         grid_x = piece_pos_x + j
                         if grid_y >= 0:
                             grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+
+            lignes_supprimees = supprimer_lignes()
+            score += lignes_supprimees * 100
 
             # Nouvelle pièce
             nouvelle_piece()
@@ -154,6 +157,21 @@ def nouv_tetros():
                     piece_pos_y = 0
                     nouvelle_piece()
                     return
+
+# comptage des points + suppression des lignes
+def supprimer_lignes():
+    global grid_cells
+    lignes_supprimees = 0
+    i = grid_height - 1
+    while i >= 0:
+        if all(grid_cells[i][j] != 0 for j in range(grid_width)):
+            del grid_cells[i]
+            grid_cells.insert(0, [0] * grid_width)
+            lignes_supprimees += 1
+        else:
+            i -= 1
+    return lignes_supprimees
+
 
 fenetre = pygame.display.set_mode((largeur, hauteur))
 pygame.display.set_caption("Tetris")
@@ -205,7 +223,8 @@ while en_cours:
 
     dt = clock.tick(30) 
     next_drop(dt)
-
+    score_text = font.render(f"score: {score}", True, BLANC)
+    fenetre.blit(score_text, (10, 10))
     pygame.display.flip()
     clock.tick(5)
 pygame.quit ()
