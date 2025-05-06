@@ -86,16 +86,45 @@ def dessiner_piece(piece_id, rotation, case_x, case_y):
 
 
 def next_drop(dt):
-    global timerdrop, piece_pos_y
+    global timerdrop, piece_pos_y, piece_pos_x
+
     timerdrop -= dt
     if timerdrop <= 0:
-        piece_pos_y += 1
-        timerdrop = gravity_time  
+        piece = pieces.tetros[piece_id]["rotations"][rotation]
+        can_move = True
 
-# def nouv_tetros () :
-#     if piece_pos_y >= grid_height - 4:  
-#         piece_pos_y = grid_height - 4
-#         nouvelle_piece()
+        for i in range(4):
+            for j in range(4):
+                if piece[i][j]:
+                    new_y = piece_pos_y + i + 1
+                    new_x = piece_pos_x + j
+                    if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+                        can_move = False
+                        break
+            if not can_move:
+                break
+
+        if can_move:
+            piece_pos_y += 1
+        else:
+            # Fixer la pièce dans la grille
+            for i in range(4):
+                for j in range(4):
+                    if piece[i][j]:
+                        grid_y = piece_pos_y + i
+                        grid_x = piece_pos_x + j
+                        if grid_y >= 0:
+                            grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+
+            # Nouvelle pièce
+            nouvelle_piece()
+            piece_pos_x = grid_width // 2 - 2
+            piece_pos_y = -1
+
+        timerdrop = gravity_time
+
+
+
 def nouv_tetros():
     global piece_pos_x, piece_pos_y, grid_cells
 
