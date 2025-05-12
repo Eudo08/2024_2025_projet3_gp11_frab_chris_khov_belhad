@@ -28,7 +28,7 @@ while running:
         #     if event.key == pygame.player_button.K_RIGHT:
 
     
-    ecran.fill(NOIR)
+    ecran.fill(BLEU)
 
     texte = font.render("TETRIS", True, BLANC)
     texte_rect = texte.get_rect(center=player_pos)
