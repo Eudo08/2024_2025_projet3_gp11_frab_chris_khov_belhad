@@ -101,6 +101,8 @@ def next_drop(dt):
                     if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
                         can_move = False
                         break
+                  
+                        
             if not can_move:
                 break
 
@@ -115,7 +117,7 @@ def next_drop(dt):
                         grid_x = piece_pos_x + j
                         if grid_y >= 0:
                             grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
-
+                    
             lignes_supprimees = supprimer_lignes()
             score += lignes_supprimees * 100
 
@@ -186,9 +188,8 @@ while en_cours:
         if evenement.type == pygame.QUIT:
             en_cours = False
         elif evenement.type == pygame.KEYDOWN:
+
             if evenement.key == pygame.K_SPACE:
-                nouvelle_piece()  
-            elif evenement.key == pygame.K_DOWN:
                 rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
             elif evenement.key == pygame.K_ESCAPE:
                 en_cours = False
@@ -197,8 +198,10 @@ while en_cours:
                 piece = pieces.tetros[piece_id]["rotations"][rotation]
                 for i in range(4):
                     for j in range(4):
-                        if piece[i][j]:  
-                            if piece_pos_x + j < 0: 
+                        if piece[i][j]:
+                            new_x = piece_pos_x + j
+                            new_y = piece_pos_y + i
+                            if new_x < 0 or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
                                 piece_pos_x += 1  
                                 break
             elif evenement.key == pygame.K_RIGHT:
@@ -206,10 +209,33 @@ while en_cours:
                 piece = pieces.tetros[piece_id]["rotations"][rotation]
                 for i in range(4):
                     for j in range(4):
-                        if piece[i][j]:  
-                            if piece_pos_x + j >= grid_width:  
-                                piece_pos_x -= 1  
+                        if piece[i][j]:
+                            new_x = piece_pos_x + j
+                            new_y = piece_pos_y + i
+                            if new_x >= grid_width or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+                                piece_pos_x -= 1  # annule le déplacement
                                 break
+
+
+            # elif evenement.key == pygame.K_LEFT:
+                
+            #     piece_pos_x -= 1
+            #     piece = pieces.tetros[piece_id]["rotations"][rotation] 
+            #     for i in range(4):
+            #         for j in range(4):
+            #             if piece[i][j]:  
+            #                 if piece_pos_x + j < 0: 
+            #                     piece_pos_x += 1  
+            #                     break
+            # elif evenement.key == pygame.K_RIGHT:
+            #     piece_pos_x += 1
+            #     piece = pieces.tetros[piece_id]["rotations"][rotation]
+            #     for i in range(4):
+            #         for j in range(4):
+            #             if piece[i][j]:  
+            #                 if piece_pos_x + j >= grid_width:  
+            #                     piece_pos_x -= 1  
+            #                     break
 
 
 
