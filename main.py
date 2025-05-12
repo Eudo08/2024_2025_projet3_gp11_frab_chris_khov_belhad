@@ -188,9 +188,28 @@ while en_cours:
         if evenement.type == pygame.QUIT:
             en_cours = False
         elif evenement.type == pygame.KEYDOWN:
-
             if evenement.key == pygame.K_SPACE:
-                rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
+                new_rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
+                new_piece = pieces.tetros[piece_id]["rotations"][new_rotation]
+
+                valide = True
+                for i in range(4):
+                    for j in range(4):
+                        if new_piece[i][j]:
+                            x = piece_pos_x + j
+                            y = piece_pos_y + i
+
+                            if x < 0 or x >= grid_width or y >= grid_height:
+                                valide = False
+                                break  
+                            elif y >= 0 and grid_cells[y][x] != 0:
+                                valide = False
+                                break 
+                    if not valide:
+                        break  
+                if valide:
+                    rotation = new_rotation
+
             elif evenement.key == pygame.K_ESCAPE:
                 en_cours = False
             elif evenement.key == pygame.K_LEFT:
