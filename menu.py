@@ -1,5 +1,5 @@
 import pygame
-import sys 
+# import sys 
 from tetris_j import en_cours
 from tools import Button
 
@@ -75,6 +75,7 @@ def show_menu():
     button_width, button_height = 200, 50
     start_x = ecran.get_width() / 2 - ecran.get_height() / 2
     player_button = Button("Joueur", start_x, 200, button_width, button_height, button_color, hover_color)
+
     pass
 
 
