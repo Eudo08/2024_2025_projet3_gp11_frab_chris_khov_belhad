@@ -13,7 +13,7 @@ font = pygame.font.Font("image/Drawliner.ttf",30)
 # font = pygame.font.SysFont("Drawliner", 30)
 grid = []
 grid_height = 20
-grid_width = 10
+grid_width = 6
 grid_cellsize = 0
 grid_cells = []
 grid_centerX = 0
@@ -62,12 +62,12 @@ BLANC = (255, 255, 255)
 GRIS = (193, 193, 193)
 BLEU = (0, 150, 255)
 
-piece_id = random.choice(list(pieces.tetros.keys()))
+piece_id = 2
 rotation = 0
 
 def nouvelle_piece():
     global piece_id, rotation
-    piece_id = random.choice(list(pieces.tetros.keys()))
+    piece_id = 2
     rotation = 0
 
 
