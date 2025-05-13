@@ -1,6 +1,7 @@
 import pygame
 import sys 
-from main import en_cours
+from tetris_j import en_cours
+import tools
 
 pygame.init()
 
@@ -21,12 +22,6 @@ player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 
 running = True
 clock = pygame.time.Clock()
-
-def draw_button(ecran, text, x, y, w, h, color, text_color):
-    pygame.draw.rect(ecran, (x, y, w, h))
-    text_surface = font.render(text, True, text_color)
-    text_rect = text_surface.get_rect(center=(x + w // 2, y + h // 2))
-    ecran.blit(text_surface, text_rect)
 
 
 # # while running:
@@ -68,12 +63,21 @@ def draw_button(ecran, text, x, y, w, h, color, text_color):
 
 # pygame.quit()
 
+def draw_button(ecran, text, x, y, w, h, color, text_color):
+    pygame.draw.rect(ecran, (x, y, w, h))
+    text_surface = font.render(text, True, text_color)
+    text_rect = text_surface.get_rect(center=(x + w // 2, y + h // 2))
+    ecran.blit(text_surface, text_rect)
+
 def show_menu():
-    buton_color = (ROUGE)
+    button_color = (ROUGE)
     hover_color = (BLEU)
     button_width, button_height = 200, 50
-    
+    start_x = ecran.get_width() / 2 - ecran.get_height() / 2
+    player_button = Button("Joueur", start_x, 200, button_width, button_height, button_color, hover_color)
     pass
+
+
 
 while running: 
     ecran.fill(NOIR) 
