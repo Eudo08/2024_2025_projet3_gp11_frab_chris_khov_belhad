@@ -274,3 +274,12 @@ while en_cours:
     pygame.display.flip()
     clock.tick(5)
 pygame.quit ()
+
+def state_of_object ():
+    pass
+
+def state_of_environnement ():
+    pass
+
+def action_to_do ():
+    pass
