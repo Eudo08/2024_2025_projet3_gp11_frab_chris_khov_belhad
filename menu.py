@@ -1,5 +1,5 @@
 import pygame
-# import sys 
+import sys 
 from tetris_j import en_cours
 from tools import Button
 
@@ -76,8 +76,17 @@ def show_menu():
     start_x = ecran.get_width() / 2 - ecran.get_height() / 2
     player_button = Button("Joueur", start_x, 200, button_width, button_height, button_color, hover_color)
 
-    pass
+    menu_running = True
+    while menu_running:
+        ecran.fill(NOIR)
 
+        font_title = pygame.font.SysFont (None, 60)
+        texte = font.render("TETRIS", True, BLANC) 
+        texte_rect = texte.get_rect(center=player_pos)
+        ecran.blit(texte, texte_rect)
+
+        mouse_pos = pygame.mouse.get_pos ()
+        mouse_clicked = False
 
 
 # while running: 
@@ -98,7 +107,7 @@ def show_menu():
 #     ecran.fill(NOIR) 
 #     texte = font.render("TETRIS", True, BLANC) 
 #     texte_rect = texte.get_rect(center=player_pos)
-#     ecran.blit(texte, texte_rect) 
+#     ecran.blit(texte, texte_rect)  
                                                             
 #     pygame.display.flip() 
 #     clock.tick(60) 
