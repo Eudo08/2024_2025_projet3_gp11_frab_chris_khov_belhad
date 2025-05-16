@@ -5,6 +5,17 @@ import pieces
 
 pygame.init()
 
+
+situation1 = [
+    [1],
+    [1]
+]
+
+situation2 = [
+    [1],
+    [0]
+]
+
 largeur = 800
 hauteur = 600
 taille_bloc = 25
@@ -255,7 +266,13 @@ while en_cours:
     fenetre.blit(score_text, (10, 10))
     pygame.display.flip()
 
+    # def appliquer_situation1_situation2():
+    #     for col in range(grid_width):
+    #         for row in range(grid_height - 1):
+    #             if [1 if grid_cells[row][col] != 0 else 0, 1 if grid_cells[row+1][col] != 0 else 0] == [1, 1]:
+    #                 grid_cells[row+1][col] = 0        
     for row in grid_cells:
+        # appliquer_situation1_situation2(row)
         print([1 if cell != 0 else 0 for cell in row])
     print("-"*30)
     clock.tick(5)
@@ -270,3 +287,10 @@ def state_of_environnement ():
 
 def action_to_do ():
     pass
+
+
+
+
+
+
+
