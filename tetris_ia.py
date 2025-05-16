@@ -5,6 +5,17 @@ import pieces
 
 pygame.init()
 
+
+situation1 = [
+    [1],
+    [1]
+]
+
+situation2 = [
+    [1],
+    [0]
+]
+
 largeur = 800
 hauteur = 600
 taille_bloc = 25
@@ -158,12 +169,14 @@ def nouv_tetros():
                                 grid_x = piece_pos_x + l
                                 if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
                                     grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+                                    cell_state = 1
+                                    
 
                     # Générer une nouvelle pièce
                     piece_pos_x = grid_width // 2 - 2
                     piece_pos_y = 0
                     nouvelle_piece()
-                    return
+                    return cell_state
 
 # comptage des points + suppression des lignes
 def supprimer_lignes():
@@ -239,28 +252,8 @@ while en_cours:
                             if new_x >= grid_width or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
                                 piece_pos_x -= 1  # annule le déplacement
                                 break
-
-
-            # elif evenement.key == pygame.K_LEFT:
-                
-            #     piece_pos_x -= 1
-            #     piece = pieces.tetros[piece_id]["rotations"][rotation] 
-            #     for i in range(4):
-            #         for j in range(4):
-            #             if piece[i][j]:  
-            #                 if piece_pos_x + j < 0: 
-            #                     piece_pos_x += 1  
-            #                     break
-            # elif evenement.key == pygame.K_RIGHT:
-            #     piece_pos_x += 1
-            #     piece = pieces.tetros[piece_id]["rotations"][rotation]
-            #     for i in range(4):
-            #         for j in range(4):
-            #             if piece[i][j]:  
-            #                 if piece_pos_x + j >= grid_width:  
-            #                     piece_pos_x -= 1  
-            #                     break
-
+            # elif evenement.key == 
+    
 
 
 
@@ -276,7 +269,18 @@ while en_cours:
     score_text = font.render(f"score: {score}", True, BLANC)
     fenetre.blit(score_text, (10, 10))
     pygame.display.flip()
+
+    # def appliquer_situation1_situation2():
+    #     for col in range(grid_width):
+    #         for row in range(grid_height - 1):
+    #             if [1 if grid_cells[row][col] != 0 else 0, 1 if grid_cells[row+1][col] != 0 else 0] == [1, 1]:
+    #                 grid_cells[row+1][col] = 0        
+    for row in grid_cells:
+        # appliquer_situation1_situation2(row)
+        print([1 if cell != 0 else 0 for cell in row])
+    print("-"*30)
     clock.tick(5)
+    
 pygame.quit ()
 
 def state_of_object ():
