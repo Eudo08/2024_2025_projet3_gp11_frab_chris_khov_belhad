@@ -1,6 +1,6 @@
 import pygame
 import sys 
-from tetris_j import en_cours
+import tetris_j
 from tools import Button
 
 pygame.init()
@@ -87,6 +87,25 @@ def show_menu():
 
         mouse_pos = pygame.mouse.get_pos ()
         mouse_clicked = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_clicked = True
+
+        player_button.update(mouse_pos)
+
+        player_button.draw(ecran)
+        
+        if player_button.check_cliked (mouse_pos, mouse_clicked):
+            menu_running = False
+            tetris_j()
+        
+
+
 
 
 # while running: 
