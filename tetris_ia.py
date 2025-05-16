@@ -121,6 +121,10 @@ def next_drop(dt):
                     
             lignes_supprimees = supprimer_lignes()
             score += lignes_supprimees * 100
+        
+        # environnemnt_state = []
+        # for i in range (6):
+        #     for j in range (20):
 
             # Nouvelle pièce
             nouvelle_piece()
@@ -278,8 +282,11 @@ pygame.quit ()
 def state_of_object ():
     pass
 
-def state_of_environnement ():
+def matrice_envrionnement ():
     pass
 
 def action_to_do ():
+    pass
+
+def Q_table():
     pass
