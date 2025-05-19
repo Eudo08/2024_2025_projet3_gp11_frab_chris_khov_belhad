@@ -1,6 +1,7 @@
 import pygame
 import random
 import pieces
+import utils
 
 
 pygame.init()
@@ -16,6 +17,12 @@ situation2 = [
     [0]
 ]
 
+dico_bordures = utils.charger_dico_json("bordures.json")
+# Trouver le prochain etat_id disponible
+if dico_bordures:
+    etat_id = max(map(int, dico_bordures.keys())) + 1
+else:
+    etat_id = 0
 largeur = 800
 hauteur = 600
 taille_bloc = 25
@@ -81,7 +88,17 @@ def nouvelle_piece():
     piece_id = 2
     rotation = 0
 
+def state_of_object ():
+    pass
 
+def matrice_envrionnement ():
+    pass
+
+def action_to_do ():
+    pass
+
+def Q_table():
+    pass
 
 
 def dessiner_piece(piece_id, rotation, case_x, case_y):
@@ -108,7 +125,7 @@ def matrice_bordure_superieure():
 
 
 def next_drop(dt):
-    global timerdrop, piece_pos_y, piece_pos_x, score
+    global timerdrop, piece_pos_y, piece_pos_x, score, etat_id, en_cours
 
     timerdrop -= dt
     if timerdrop <= 0:
@@ -148,6 +165,11 @@ def next_drop(dt):
             for row in bordure:
                 print(row)
             print("-" * 30)
+            bordure = matrice_bordure_superieure()
+            if not utils.matrice_deja_presente(dico_bordures, bordure):
+                utils.enregistrer_bordure(dico_bordures, etat_id, bordure)
+                etat_id += 1 
+
 
             # Nouvelle pièce
             nouvelle_piece()
@@ -161,7 +183,8 @@ def next_drop(dt):
                     if piece[i][j]:
                         grid_y = piece_pos_y + i
                         grid_x = piece_pos_x + j
-                        if grid_y >= 0 and grid_cells[grid_y][grid_x] != 0:
+                        # Correction ici : vérifie que grid_y est dans la grille avant d'accéder à grid_cells
+                        if grid_y >= 0 and grid_y < grid_height and grid_cells[grid_y][grid_x] != 0:
                             en_cours = False  # Fin du jeu
 
         timerdrop = gravity_time
@@ -301,18 +324,18 @@ while en_cours:
     #     print([1 if cell != 0 else 0 for cell in row])
     # print("-"*30)
     # clock.tick(5)
-    
+
+print("Dictionnaire des bordures enregistrées :")
+for k, v in dico_bordures.items():
+    print(f"État {k}:")
+    for row in v:
+        print(row)
+    print("-" * 30)
+
 pygame.quit ()
 
-def state_of_object ():
-    pass
+utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
+print("Dictionnaire des bordures sauvegardé dans bordures.json")
 
-def matrice_envrionnement ():
-    pass
 
-def action_to_do ():
-    pass
-
-def Q_table():
-    pass
 
