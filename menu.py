@@ -14,24 +14,21 @@ ROUGE = (255, 0, 0)
 
 ecran = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Tetris")
-font = pygame.font.Font("image/Drawliner.ttf",30)
+font = pygame.font.Font("assets/font/Drawliner.ttf",30)
 img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
 
 player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 
-running = True
 clock = pygame.time.Clock()
 
-
-
-def show_menu():
+def show_menu(): 
     button_color = (ROUGE)
     hover_color = (BLEU)
     button_width, button_height = 200, 50
     start_x = ecran.get_width() / 2 - ecran.get_height() / 2
     player_button = Button("Joueur", start_x, 200, button_width, button_height, button_color, hover_color)
-
+    running = True
     while running:
         ecran.fill(NOIR)
 
@@ -54,7 +51,7 @@ def show_menu():
 
         player_button.draw(ecran)
         
-        if player_button.check_cliked (mouse_pos, mouse_clicked):
+        if player_button.check_clicked (mouse_pos, mouse_clicked):
             running = False
             tetris_ia()
 
@@ -62,5 +59,5 @@ def show_menu():
         clock.tick(30)
         
 
-if __name__ == "__menu__":
+if __name__ == "__main__":
     show_menu()

@@ -7,15 +7,7 @@ import utils
 pygame.init()
 
 
-situation1 = [
-    [1],
-    [1]
-]
 
-situation2 = [
-    [1],
-    [0]
-]
 
 dico_bordures = utils.charger_dico_json("bordures.json")
 # Trouver le prochain etat_id disponible
@@ -27,7 +19,7 @@ largeur = 800
 hauteur = 600
 taille_bloc = 25
 score = 0
-font = pygame.font.Font("image/Drawliner.ttf",30)
+font = pygame.font.Font("assets/font/Drawliner.ttf",30)
 # font = pygame.font.SysFont("Drawliner", 30)
 grid = []
 grid_height = 20

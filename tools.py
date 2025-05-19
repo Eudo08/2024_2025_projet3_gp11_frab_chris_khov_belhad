@@ -21,8 +21,8 @@ class Button:
         text_rect = text_surface.get_rect(center=self.rect.center)
         surface.blit(text_surface, text_rect)
 
-    def uptate (self, mouse_pos):
+    def update (self, mouse_pos):
         self.is_hovered = self.rect.collidepoint(mouse_pos)
 
-    def che_clicked (self, mouse_pos, mouse_clicked):
+    def check_clicked (self, mouse_pos, mouse_clicked):
         return self.rect.collidepoint(mouse_pos) and mouse_clicked
