@@ -55,7 +55,7 @@ python main.py
 
 
 ### Contribution
-**[M. Pioche](https://github.com/jimpioche)**  : Conception du squelette de base du projet et test de validation.  
+
 **[Louise Christophe](https://github.com/louisechristophe), [Eudocie de Khovrine](https://github.com/Eudo08), [Marine Fraboulet](https://github.com/MAMARINEEE)**, [WaelBelhaddad](https://github.com/WaelBELHADDAD) : Développement et ajout des fonctionnalités, des validations et des conversions entre bases, ainsi que l'amélioration de la structure générale.  
 **ChatGPT** : Assistance pour les corrections de code et structuration du README.
 
