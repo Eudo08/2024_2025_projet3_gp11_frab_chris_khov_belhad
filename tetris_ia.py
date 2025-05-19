@@ -31,7 +31,7 @@ grid_centerX = 0
 grid_centerY = 0
 piece_pos_x = grid_width // 2 - 2
 piece_pos_y = -1
-gravity_time = 1
+gravity_time = 500
 timerdrop = gravity_time
 
 def init_grid():
@@ -96,6 +96,16 @@ def dessiner_piece(piece_id, rotation, case_x, case_y):
                 pygame.draw.rect(fenetre, GRIS, (x, y, grid_cellsize, grid_cellsize), 1)
 
 
+def matrice_bordure_superieure():
+    # Crée une matrice de zéros
+    bordure = [[0 for _ in range(grid_width)] for _ in range(grid_height)]
+    for col in range(grid_width):
+        for row in range(grid_height):
+            if grid_cells[row][col] != 0:
+                bordure[row][col] = 1
+                break  # On ne garde que le premier "1" de la colonne
+    return bordure
+
 
 def next_drop(dt):
     global timerdrop, piece_pos_y, piece_pos_x, score
@@ -132,15 +142,27 @@ def next_drop(dt):
                     
             lignes_supprimees = supprimer_lignes()
             score += lignes_supprimees * 100
-        
-        # environnemnt_state = []
-        # for i in range (6):
-        #     for j in range (20):
+
+            # Affichage de la bordure supérieure à chaque pose de bloc
+            bordure = matrice_bordure_superieure()
+            for row in bordure:
+                print(row)
+            print("-" * 30)
 
             # Nouvelle pièce
             nouvelle_piece()
             piece_pos_x = grid_width // 2 - 2
             piece_pos_y = -1
+
+             # Vérifie si la nouvelle pièce peut être placée
+            piece = pieces.tetros[piece_id]["rotations"][rotation]
+            for i in range(4):
+                for j in range(4):
+                    if piece[i][j]:
+                        grid_y = piece_pos_y + i
+                        grid_x = piece_pos_x + j
+                        if grid_y >= 0 and grid_cells[grid_y][grid_x] != 0:
+                            en_cours = False  # Fin du jeu
 
         timerdrop = gravity_time
 
@@ -260,7 +282,6 @@ while en_cours:
     fenetre.fill(NOIR)
     draw_grid()
 
-    nouv_tetros()
     draw_locked_cells()
     dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
 
@@ -275,11 +296,11 @@ while en_cours:
     #         for row in range(grid_height - 1):
     #             if [1 if grid_cells[row][col] != 0 else 0, 1 if grid_cells[row+1][col] != 0 else 0] == [1, 1]:
     #                 grid_cells[row+1][col] = 0        
-    for row in grid_cells:
+    # for row in grid_cells:
         # appliquer_situation1_situation2(row)
-        print([1 if cell != 0 else 0 for cell in row])
-    print("-"*30)
-    clock.tick(5)
+    #     print([1 if cell != 0 else 0 for cell in row])
+    # print("-"*30)
+    # clock.tick(5)
     
 pygame.quit ()
 
@@ -294,3 +315,4 @@ def action_to_do ():
 
 def Q_table():
     pass
+
