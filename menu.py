@@ -14,7 +14,7 @@ ROUGE = (255, 0, 0)
 
 ecran = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Tetris")
-font = pygame.font.Font("image/Drawliner.ttf",30)
+font = pygame.font.Font("assets/font/Drawliner.ttf",30)
 img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
 
