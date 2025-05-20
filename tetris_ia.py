@@ -175,7 +175,6 @@ def next_drop(dt):
                     if piece[i][j]:
                         grid_y = piece_pos_y + i
                         grid_x = piece_pos_x + j
-                        # Correction ici : vérifie que grid_y est dans la grille avant d'accéder à grid_cells
                         if grid_y >= 0 and grid_y < grid_height and grid_cells[grid_y][grid_x] != 0:
                             en_cours = False  # Fin du jeu
 
@@ -289,8 +288,8 @@ while en_cours:
                             if new_x >= grid_width or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
                                 piece_pos_x -= 1  # annule le déplacement
                                 break
-            # elif evenement.key == 
-    
+
+
 
 
 
@@ -323,7 +322,8 @@ for k, v in dico_bordures.items():
     for row in v:
         print(row)
     print("-" * 30)
-
+texte = font.render("S", True, BLANC)
+print("Fin du jeu")
 pygame.quit ()
 
 utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
