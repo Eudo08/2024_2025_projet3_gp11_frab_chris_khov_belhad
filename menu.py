@@ -1,6 +1,7 @@
 import pygame
 import sys 
 import tetris_ia
+import tetris_j
 from tools import Button
 
 pygame.init()
@@ -14,7 +15,7 @@ ROUGE = (255, 0, 0)
 
 ecran = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Tetris")
-font = pygame.font.Font("assets/font/Drawliner.ttf",30)
+font = pygame.font.Font("assets/font/Drawliner.ttf",150)
 img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
 
@@ -23,12 +24,18 @@ player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 clock = pygame.time.Clock()
 
 def show_menu(): 
+
     button_color = (ROUGE)
     hover_color = (BLEU)
     button_width, button_height = 200, 50
+
     start_x = ecran.get_width() / 2 - ecran.get_height() / 2
-    player_button = Button("Joueur", start_x, 200, button_width, button_height, button_color, hover_color)
+
+    ia_button = Button("IA", 150, 450, button_width, button_height, button_color, hover_color)
+    player_button = Button("Jouer !", 450, 450, button_width, button_height, button_color, hover_color)
+
     running = True
+
     while running:
         ecran.fill(NOIR)
 
@@ -47,13 +54,19 @@ def show_menu():
                 if event.button == 1:
                     mouse_clicked = True
 
+        ia_button.update(mouse_pos)
         player_button.update(mouse_pos)
 
+        ia_button.draw(ecran)
         player_button.draw(ecran)
         
-        if player_button.check_clicked (mouse_pos, mouse_clicked):
+        if ia_button.check_clicked (mouse_pos, mouse_clicked):
             running = False
             tetris_ia()
+
+        if player_button.check_clicked (mouse_pos, mouse_clicked):
+            running = False
+            tetris_j()
 
         pygame.display.flip()
         clock.tick(30)
