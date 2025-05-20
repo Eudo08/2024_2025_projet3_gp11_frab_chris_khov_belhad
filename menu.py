@@ -18,6 +18,9 @@ pygame.display.set_caption("Tetris")
 font = pygame.font.Font("assets/font/Drawliner.ttf",150)
 img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
+img_ia = pygame.image.load ('image/tetris_ia.png')
+petit_img_ia = pygame.transform.scale(img_ia, (img_ia.get_width() // 3, img_ia.get_height() // 3))
+img_ia = pygame.image.load ('image/tetris_ia.png')
 
 player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 
@@ -29,10 +32,8 @@ def show_menu():
     hover_color = (BLEU)
     button_width, button_height = 200, 50
 
-    start_x = ecran.get_width() / 2 - ecran.get_height() / 2
-
-    ia_button = Button("IA", 150, 450, button_width, button_height, button_color, hover_color)
-    player_button = Button("Jouer !", 450, 450, button_width, button_height, button_color, hover_color)
+    ia_button = Button("IA", 450, 450, button_width, button_height, button_color, hover_color)
+    player_button = Button("Jouer !", 150, 450, button_width, button_height, button_color, hover_color)
 
     running = True
 
@@ -41,6 +42,7 @@ def show_menu():
 
         texte = font.render("TETRIS", True, BLANC) 
         texte_rect = texte.get_rect(center=player_pos)
+        img_ia_rect = img_ia.get_rect()
         ecran.blit(texte, texte_rect)
 
         mouse_pos = pygame.mouse.get_pos ()
