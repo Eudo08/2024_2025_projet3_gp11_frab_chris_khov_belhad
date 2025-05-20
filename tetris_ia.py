@@ -28,9 +28,9 @@ grid_cellsize = 0
 grid_cells = []
 grid_centerX = 0
 grid_centerY = 0
-piece_pos_x = grid_width // 2 - 2
+piece_pos_x = 0
 piece_pos_y = -1
-gravity_time = 500
+gravity_time = 200
 timerdrop = gravity_time
 
 def init_grid():
@@ -76,9 +76,14 @@ piece_id = 2
 rotation = 0
 
 def nouvelle_piece():
-    global piece_id, rotation
+    global piece_id, rotation, piece_pos_x, en_cours
     piece_id = 2
     rotation = 0
+    col = action_to_do()
+    if col is None:
+        en_cours = False  # Plus de placement possible, fin du jeu
+    else:
+        piece_pos_x = col
 
 def state_of_object ():
     pass
@@ -86,8 +91,28 @@ def state_of_object ():
 def matrice_envrionnement ():
     pass
 
-def action_to_do ():
-    pass
+def action_to_do():
+    largeur_piece = 2
+    colonnes_valides = []
+    for col in range(grid_width - largeur_piece + 1):
+        collision = False
+        for i in range(largeur_piece):
+            for j in range(largeur_piece):
+                grid_x = col + j
+                grid_y = piece_pos_y + i  # piece_pos_y vaut -1 au début
+                # On vérifie que grid_x est dans la grille
+                if not (0 <= grid_x < grid_width):
+                    collision = True
+                # On vérifie la collision uniquement si grid_y >= 0 (dans la grille)
+                elif grid_y >= 0 and grid_cells[grid_y][grid_x] != 0:
+                    collision = True
+        if not collision:
+            colonnes_valides.append(col)
+    if colonnes_valides:
+        return random.choice(colonnes_valides)
+    else:
+        # Si aucune colonne n'est valide, retourne None pour signaler la fin du jeu
+        return None
 
 def Q_table():
     pass
@@ -129,7 +154,8 @@ def next_drop(dt):
                 if piece[i][j]:
                     new_y = piece_pos_y + i + 1
                     new_x = piece_pos_x + j
-                    if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+                    # Correction : on vérifie que new_x est dans la grille avant d'accéder à grid_cells
+                    if new_y >= grid_height or not (0 <= new_x < grid_width) or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
                         can_move = False
                         break
                   
@@ -146,7 +172,8 @@ def next_drop(dt):
                     if piece[i][j]:
                         grid_y = piece_pos_y + i
                         grid_x = piece_pos_x + j
-                        if grid_y >= 0:
+                        # Correction : on vérifie que grid_y et grid_x sont dans la grille avant d'écrire
+                        if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
                             grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
                     
             lignes_supprimees = supprimer_lignes()
@@ -165,7 +192,7 @@ def next_drop(dt):
 
             # Nouvelle pièce
             nouvelle_piece()
-            piece_pos_x = grid_width // 2 - 2
+            # piece_pos_x = grid_width // 2 - 2
             piece_pos_y = -1
 
              # Vérifie si la nouvelle pièce peut être placée
@@ -176,7 +203,11 @@ def next_drop(dt):
                         grid_y = piece_pos_y + i
                         grid_x = piece_pos_x + j
                         # Correction ici : vérifie que grid_y est dans la grille avant d'accéder à grid_cells
-                        if grid_y >= 0 and grid_y < grid_height and grid_cells[grid_y][grid_x] != 0:
+                        if (
+                            0 <= grid_y < grid_height and
+                            0 <= grid_x < grid_width and
+                            grid_cells[grid_y][grid_x] != 0
+                        ):
                             en_cours = False  # Fin du jeu
 
         timerdrop = gravity_time
@@ -238,57 +269,70 @@ clock = pygame.time.Clock()
 init_grid()
 origine_x = grid_centerX
 origine_y = grid_centerY
+
 while en_cours:
     for evenement in pygame.event.get():
         if evenement.type == pygame.QUIT:
             en_cours = False
-        elif evenement.type == pygame.KEYDOWN:
-            if evenement.key == pygame.K_SPACE:
-                new_rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
-                new_piece = pieces.tetros[piece_id]["rotations"][new_rotation]
+    
+    fenetre.fill(NOIR)
+    draw_grid()
+    draw_locked_cells()
+    dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
 
-                valide = True
-                for i in range(4):
-                    for j in range(4):
-                        if new_piece[i][j]:
-                            x = piece_pos_x + j
-                            y = piece_pos_y + i
+    dt = clock.tick(30) 
+    next_drop(dt)
+    score_text = font.render(f"score: {score}", True, BLANC)
+    fenetre.blit(score_text, (10, 10))
+    pygame.display.flip()
 
-                            if x < 0 or x >= grid_width or y >= grid_height:
-                                valide = False
-                                break  
-                            elif y >= 0 and grid_cells[y][x] != 0:
-                                valide = False
-                                break 
-                    if not valide:
-                        break  
-                if valide:
-                    rotation = new_rotation
+        # elif evenement.type == pygame.KEYDOWN:
+        #     if evenement.key == pygame.K_SPACE:
+        #         new_rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
+        #         new_piece = pieces.tetros[piece_id]["rotations"][new_rotation]
 
-            elif evenement.key == pygame.K_ESCAPE:
-                en_cours = False
-            elif evenement.key == pygame.K_LEFT:
-                piece_pos_x -= 1
-                piece = pieces.tetros[piece_id]["rotations"][rotation]
-                for i in range(4):
-                    for j in range(4):
-                        if piece[i][j]:
-                            new_x = piece_pos_x + j
-                            new_y = piece_pos_y + i
-                            if new_x < 0 or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
-                                piece_pos_x += 1  
-                                break
-            elif evenement.key == pygame.K_RIGHT:
-                piece_pos_x += 1
-                piece = pieces.tetros[piece_id]["rotations"][rotation]
-                for i in range(4):
-                    for j in range(4):
-                        if piece[i][j]:
-                            new_x = piece_pos_x + j
-                            new_y = piece_pos_y + i
-                            if new_x >= grid_width or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
-                                piece_pos_x -= 1  # annule le déplacement
-                                break
+        #         valide = True
+        #         for i in range(4):
+        #             for j in range(4):
+        #                 if new_piece[i][j]:
+        #                     x = piece_pos_x + j
+        #                     y = piece_pos_y + i
+
+        #                     if x < 0 or x >= grid_width or y >= grid_height:
+        #                         valide = False
+        #                         break  
+        #                     elif y >= 0 and grid_cells[y][x] != 0:
+        #                         valide = False
+        #                         break 
+        #             if not valide:
+        #                 break  
+        #         if valide:
+        #             rotation = new_rotation
+
+        #     elif evenement.key == pygame.K_ESCAPE:
+        #         en_cours = False
+        #     elif evenement.key == pygame.K_LEFT:
+        #         piece_pos_x -= 1
+        #         piece = pieces.tetros[piece_id]["rotations"][rotation]
+        #         for i in range(4):
+        #             for j in range(4):
+        #                 if piece[i][j]:
+        #                     new_x = piece_pos_x + j
+        #                     new_y = piece_pos_y + i
+        #                     if new_x < 0 or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+        #                         piece_pos_x += 1  
+        #                         break
+        #     elif evenement.key == pygame.K_RIGHT:
+        #         piece_pos_x += 1
+        #         piece = pieces.tetros[piece_id]["rotations"][rotation]
+        #         for i in range(4):
+        #             for j in range(4):
+        #                 if piece[i][j]:
+        #                     new_x = piece_pos_x + j
+        #                     new_y = piece_pos_y + i
+        #                     if new_x >= grid_width or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+        #                         piece_pos_x -= 1  # annule le déplacement
+        #                         break
             # elif evenement.key == 
     
 
