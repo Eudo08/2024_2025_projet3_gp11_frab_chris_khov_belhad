@@ -20,6 +20,7 @@ hauteur = 600
 taille_bloc = 25
 score = 0
 font = pygame.font.Font("assets/font/Drawliner.ttf",30)
+font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
 # font = pygame.font.SysFont("Drawliner", 30)
 grid = []
 grid_height = 20
@@ -30,8 +31,11 @@ grid_centerX = 0
 grid_centerY = 0
 piece_pos_x = grid_width // 2 - 2
 piece_pos_y = -1
-gravity_time = 500
+gravity_time = 50
 timerdrop = gravity_time
+player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
+fenetre = pygame.display.set_mode((largeur, hauteur))
+pygame.display.set_caption("Tetris")
 
 def init_grid():
     global grid_cellsize, grid_cells, grid_centerX, grid_centerY
@@ -229,8 +233,7 @@ def supprimer_lignes():
     return lignes_supprimees
 
 
-fenetre = pygame.display.set_mode((largeur, hauteur))
-pygame.display.set_caption("Tetris")
+
 
 en_cours = True
 clock = pygame.time.Clock()
@@ -305,16 +308,17 @@ while en_cours:
     fenetre.blit(score_text, (10, 10))
     pygame.display.flip()
 
-    # def appliquer_situation1_situation2():
-    #     for col in range(grid_width):
-    #         for row in range(grid_height - 1):
-    #             if [1 if grid_cells[row][col] != 0 else 0, 1 if grid_cells[row+1][col] != 0 else 0] == [1, 1]:
-    #                 grid_cells[row+1][col] = 0        
-    # for row in grid_cells:
-        # appliquer_situation1_situation2(row)
-    #     print([1 if cell != 0 else 0 for cell in row])
-    # print("-"*30)
-    # clock.tick(5)
+text_gameover = font2.render("Game over", True, BLANC)
+text_rect = text_gameover.get_rect(center=player_pos)
+fenetre.blit(text_gameover, text_rect)
+pygame.display.flip()
+
+attente = True
+while attente:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            attente = False
+pygame.quit()
 
 print("Dictionnaire des bordures enregistrées :")
 for k, v in dico_bordures.items():
@@ -322,9 +326,8 @@ for k, v in dico_bordures.items():
     for row in v:
         print(row)
     print("-" * 30)
-texte = font.render("S", True, BLANC)
-print("Fin du jeu")
-pygame.quit ()
+
+
 
 utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
 print("Dictionnaire des bordures sauvegardé dans bordures.json")
