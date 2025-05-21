@@ -20,7 +20,8 @@ img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
 img_ia = pygame.image.load ('image/tetris_ia.png')
 petit_img_ia = pygame.transform.scale(img_ia, (img_ia.get_width() // 3, img_ia.get_height() // 3))
-img_ia = pygame.image.load ('image/tetris_ia.png')
+img_j = pygame.image.load ('image/tetris_ia.png')
+petit_img_j = pygame.transform.scale(img_j, (img_j.get_width() // 3, img_j.get_height() // 3))
 
 player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 
