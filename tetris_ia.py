@@ -22,6 +22,9 @@ score = 0
 font = pygame.font.Font("assets/font/Drawliner.ttf",30)
 font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
 # font = pygame.font.SysFont("Drawliner", 30)
+epsilon = 0.1
+alpha=0.1
+gamma=0.9
 grid = []
 grid_height = 20
 grid_width = 6
@@ -113,8 +116,50 @@ def action_to_do():
 
     piece_pos_x = random.randint(min_x, max_x)
 
+def calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur):
+    """
+    Calcule la récompense pour l'IA :
+    - -50 si game over
+    - +20 par ligne supprimée
+    - -5 si la hauteur maximale augmente
+    """
+    recompense = 0
+    if game_over:
+        recompense -= 50
+    recompense += 20 * lignes_supprimees
+    if nouvelle_hauteur > ancienne_hauteur:
+        recompense -= 5
+    return recompense
+
 def Q_table():
-    pass
+    """
+    Choisit la colonne selon la Q-table de l'état courant (bordure).
+    Avec epsilon, fait parfois un choix aléatoire (exploration).
+    """
+    global dico_bordures, grid_width, piece_pos_x
+
+    Q = dico_bordures[str(etat_id)]["Q_table"]
+    # Politique epsilon-greedy
+    if random.random() < epsilon:
+        action = random.randint(0, grid_width - 2)
+    else:
+        maxQ = max(Q)
+        actions = [i for i, q in enumerate(Q) if q == maxQ]
+        action = random.choice(actions)
+    piece_pos_x = action
+    return action  # Utile pour la mise à jour de la Q-table
+
+
+def update_Q_table(etat_id, action, reward, next_etat_id, alpha, gamma):
+    """
+    Met à jour la Q-table pour l'état et l'action donnés.
+    """
+    Q = dico_bordures[str(etat_id)]["Q_table"]
+    if next_etat_id is not None and "Q_table" in dico_bordures[str(next_etat_id)]:
+        next_Q = max(dico_bordures[str(next_etat_id)]["Q_table"])
+    else:
+        next_Q = 0
+    Q[action] = Q[action] + alpha * (reward + gamma * next_Q - Q[action])
 
 
 def dessiner_piece(piece_id, rotation, case_x, case_y):
@@ -183,7 +228,7 @@ def next_drop(dt):
             print("-" * 30)
             bordure = matrice_bordure_superieure()
             if not utils.matrice_deja_presente(dico_bordures, bordure):
-                utils.enregistrer_bordure(dico_bordures, etat_id, bordure)
+                utils.enregistrer_bordure(dico_bordures, etat_id, bordure, grid_width)
                 etat_id += 1 
 
 
