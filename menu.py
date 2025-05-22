@@ -1,6 +1,7 @@
 import pygame
 import sys 
 import tetris_ia
+import tetris_j
 from tools import Button
 
 pygame.init()
@@ -14,26 +15,35 @@ ROUGE = (255, 0, 0)
 
 ecran = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Tetris")
-font = pygame.font.Font("assets/font/Drawliner.ttf",30)
+font = pygame.font.Font("assets/font/Drawliner.ttf",150)
 img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
+img_ia = pygame.image.load ('image/tetris_ia.png')
+petit_img_ia = pygame.transform.scale(img_ia, (img_ia.get_width() // 3, img_ia.get_height() // 3))
+img_j = pygame.image.load ('image/tetris_ia.png')
+petit_img_j = pygame.transform.scale(img_j, (img_j.get_width() // 3, img_j.get_height() // 3))
 
 player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 
 clock = pygame.time.Clock()
 
 def show_menu(): 
+
     button_color = (ROUGE)
     hover_color = (BLEU)
     button_width, button_height = 200, 50
-    start_x = ecran.get_width() / 2 - ecran.get_height() / 2
-    player_button = Button("Joueur", start_x, 200, button_width, button_height, button_color, hover_color)
+
+    ia_button = Button("IA", 450, 450, button_width, button_height, button_color, hover_color)
+    player_button = Button("Jouer !", 150, 450, button_width, button_height, button_color, hover_color)
+
     running = True
+
     while running:
         ecran.fill(NOIR)
 
         texte = font.render("TETRIS", True, BLANC) 
         texte_rect = texte.get_rect(center=player_pos)
+        img_ia_rect = img_ia.get_rect()
         ecran.blit(texte, texte_rect)
 
         mouse_pos = pygame.mouse.get_pos ()
@@ -47,13 +57,19 @@ def show_menu():
                 if event.button == 1:
                     mouse_clicked = True
 
+        ia_button.update(mouse_pos)
         player_button.update(mouse_pos)
 
+        ia_button.draw(ecran)
         player_button.draw(ecran)
         
-        if player_button.check_clicked (mouse_pos, mouse_clicked):
+        if ia_button.check_clicked (mouse_pos, mouse_clicked):
             running = False
             tetris_ia()
+
+        if player_button.check_clicked (mouse_pos, mouse_clicked):
+            running = False
+            tetris_j()
 
         pygame.display.flip()
         clock.tick(30)
