@@ -9,23 +9,20 @@ pygame.init()
 
 
 
-
 dico_bordures = utils.charger_dico_json("bordures.json")
 # Trouver le prochain etat_id disponible
 if dico_bordures:
     etat_id = max(map(int, dico_bordures.keys())) + 1
 else:
     etat_id = 0
+
+# Paramètres de la fenêtre
 largeur = 800
 hauteur = 600
 taille_bloc = 25
 score = 0
 font = pygame.font.Font("assets/font/Drawliner.ttf",30)
 font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
-# font = pygame.font.SysFont("Drawliner", 30)
-epsilon = 0.1
-alpha=0.1
-gamma=0.9
 grid = []
 grid_height = 20
 grid_width = 6
@@ -34,12 +31,25 @@ grid_cells = []
 grid_centerX = 0
 grid_centerY = 0
 piece_pos_x = grid_width // 2 - 2
-piece_pos_y = -1
+piece_pos_y = 0
 # gravity_time = 200
 # timerdrop = gravity_time
 player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
 fenetre = pygame.display.set_mode((largeur, hauteur))
 pygame.display.set_caption("Tetris")
+# Couleurs
+NOIR = (0, 0, 0)
+BLANC = (255, 255, 255)
+GRIS = (193, 193, 193)
+BLEU = (0, 150, 255)
+
+# Paramètres de l'IA
+epsilon = 0.1
+alpha=0.1
+gamma=0.9
+
+
+
 
 def init_grid():
     global grid_cellsize, grid_cells, grid_centerX, grid_centerY
@@ -55,6 +65,10 @@ def init_grid():
             row.append(0)
         grid_cells.append(row)
 
+print(grid_cells)
+
+
+
 def draw_grid():
     h = grid_cellsize
     w = h
@@ -63,6 +77,8 @@ def draw_grid():
             x = grid_centerX + j * w
             y = grid_centerY + i * h
             pygame.draw.rect(fenetre, BLANC, (x, y, w, h), 1)
+
+
 
 def draw_locked_cells():
     for i in range(grid_height):
@@ -74,14 +90,12 @@ def draw_locked_cells():
                 pygame.draw.rect(fenetre, couleur, (x, y, grid_cellsize, grid_cellsize))
                 pygame.draw.rect(fenetre, GRIS, (x, y, grid_cellsize, grid_cellsize), 1)
 
-# Couleurs
-NOIR = (0, 0, 0)
-BLANC = (255, 255, 255)
-GRIS = (193, 193, 193)
-BLEU = (0, 150, 255)
+
 
 piece_id = 2
 rotation = 0
+
+
 
 def reset_game():
     global grid_cells, score, piece_pos_x, piece_pos_y, piece_id, rotation
@@ -92,17 +106,24 @@ def reset_game():
     piece_id = 2
     rotation = 0
     action_to_do()
-    
+
+
+print("Après reset_game, grille :")
+for row in grid_cells:
+    print(row)
+print("piece_pos_x:", piece_pos_x, "piece_pos_y:", piece_pos_y)
+
+
 def nouvelle_piece():
     global piece_id, rotation
     piece_id = 2
     rotation = 0
 
-def state_of_object ():
-    pass
 
-def matrice_envrionnement ():
-    pass
+print("Première pièce posée :", piece_id, "rotation :", rotation, "pos_x :", piece_pos_x, "pos_y :", piece_pos_y)
+for row in grid_cells:
+    print(row)
+
 
 def action_to_do():
     """
@@ -127,6 +148,7 @@ def action_to_do():
     piece_pos_x = random.randint(min_x, max_x)
 
 
+
 def calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur):
     """
     Calcule la récompense pour l'IA :
@@ -141,6 +163,8 @@ def calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle
     if nouvelle_hauteur > ancienne_hauteur:
         recompense -= 5
     return recompense
+
+
 
 def Q_table():
     """
@@ -161,6 +185,7 @@ def Q_table():
     return action  # Utile pour la mise à jour de la Q-table
 
 
+
 def update_Q_table(etat_id, action, reward, next_etat_id, alpha, gamma):
     """
     Met à jour la Q-table pour l'état et l'action donnés.
@@ -171,6 +196,7 @@ def update_Q_table(etat_id, action, reward, next_etat_id, alpha, gamma):
     else:
         next_Q = 0
     Q[action] = Q[action] + alpha * (reward + gamma * next_Q - Q[action])
+
 
 
 def entrainer_sur_bordure(etat_id, bordure, max_iterations=1000):
@@ -264,6 +290,7 @@ def entrainer_sur_bordure(etat_id, bordure, max_iterations=1000):
     return nouvelle_bordure
 
 
+
 def dessiner_piece(piece_id, rotation, case_x, case_y):
     piece = pieces.tetros[piece_id]["rotations"][rotation]
     couleur = pieces.tetros[piece_id]["couleur"]
@@ -276,6 +303,7 @@ def dessiner_piece(piece_id, rotation, case_x, case_y):
                 pygame.draw.rect(fenetre, GRIS, (x, y, grid_cellsize, grid_cellsize), 1)
 
 
+
 def matrice_bordure_superieure():
     # Crée une matrice de zéros
     bordure = [[0 for _ in range(grid_width)] for _ in range(grid_height)]
@@ -285,6 +313,7 @@ def matrice_bordure_superieure():
                 bordure[row][col] = 1
                 break  # On ne garde que le premier "1" de la colonne
     return bordure
+
 
 
 def next_drop(dt):
@@ -386,7 +415,8 @@ def nouv_tetros():
                     nouvelle_piece()
                     return cell_state
 
-# comptage des points + suppression des lignes
+
+
 def supprimer_lignes():
     global grid_cells
     lignes_supprimees = 0
@@ -402,15 +432,15 @@ def supprimer_lignes():
 
 
 
-
 en_cours = True
 clock = pygame.time.Clock()
 init_grid()
 action_to_do()
-origine_x = grid_centerX
-origine_y = grid_centerY
-
+# origine_x = grid_centerX
+# origine_y = grid_centerY
 apprentissage_en_cours = True
+
+
 
 while apprentissage_en_cours:  # Boucle infinie pour l'apprentissage
     en_cours = True
@@ -424,10 +454,6 @@ while apprentissage_en_cours:  # Boucle infinie pour l'apprentissage
                 if evenement.key == pygame.K_ESCAPE:
                     en_cours = False
                     apprentissage_en_cours = False
-
-
-
-
 
         fenetre.fill(NOIR)
         draw_grid()
@@ -457,6 +483,10 @@ while apprentissage_en_cours:  # Boucle infinie pour l'apprentissage
 
         # 3. Entraînement et pose de la pièce (ceci crée aussi la nouvelle pièce)
         nouvelle_bordure = entrainer_sur_bordure(etat_id, bordure)
+        print("Après reset_game, grille :")
+        for row in grid_cells:
+            print(row)
+        print("piece_pos_x:", piece_pos_x, "piece_pos_y:", piece_pos_y)
 
         # 4. Vérifie si la nouvelle pièce peut être placée (game over)
         piece = pieces.tetros[piece_id]["rotations"][rotation]
@@ -474,6 +504,8 @@ while apprentissage_en_cours:  # Boucle infinie pour l'apprentissage
             if not en_cours:
                 break
 
+
+
 text_gameover = font2.render("Game over", True, BLANC)
 text_rect = text_gameover.get_rect(center=player_pos)
 fenetre.blit(text_gameover, text_rect)
@@ -484,7 +516,11 @@ while attente:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             attente = False
+
+
+
 pygame.quit()
+
 
 # print("Dictionnaire des bordures enregistrées :")
 # for k, v in dico_bordures.items():
