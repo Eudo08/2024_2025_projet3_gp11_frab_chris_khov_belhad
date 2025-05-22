@@ -88,7 +88,7 @@ def reset_game():
     init_grid()
     score = 0
     piece_pos_x = random.randint(0, grid_width - 2)
-    piece_pos_y = -1
+    piece_pos_y = 0
     piece_id = 2
     rotation = 0
     action_to_do()
@@ -122,10 +122,10 @@ def action_to_do():
     largeur_piece = max_col - min_col + 1
 
     # Pour permettre à la pièce de toucher le bord gauche ET droit
-    min_x = -min_col
-    max_x = grid_width - 1 - max_col
-
+    min_x = 0
+    max_x = grid_width - largeur_piece
     piece_pos_x = random.randint(min_x, max_x)
+
 
 def calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur):
     """
@@ -178,7 +178,7 @@ def entrainer_sur_bordure(etat_id, bordure, max_iterations=1000):
     Fait tourner la Q-table sur la même bordure jusqu'à ce qu'une action soit préférée (Q > 0.80).
     Puis pose la pièce à l'endroit choisi et met à jour la grille.
     """
-    global dico_bordures, grid_width, alpha, gamma, epsilon, piece_pos_x, piece_pos_y, piece_id, rotation, grid_cells
+    global dico_bordures, grid_width, alpha, gamma, epsilon, piece_pos_x, piece_pos_y, piece_id, rotation, grid_cells, score
 
     Q = dico_bordures[str(etat_id)]["Q_table"]
     iteration = 0
@@ -258,7 +258,8 @@ def entrainer_sur_bordure(etat_id, bordure, max_iterations=1000):
 
     # Prépare la prochaine pièce
     nouvelle_piece()
-    piece_pos_y = -1
+    action_to_do()
+    piece_pos_y = 0
 
     return nouvelle_bordure
 
@@ -457,7 +458,21 @@ while apprentissage_en_cours:  # Boucle infinie pour l'apprentissage
         # 3. Entraînement et pose de la pièce (ceci crée aussi la nouvelle pièce)
         nouvelle_bordure = entrainer_sur_bordure(etat_id, bordure)
 
-        # 4. La boucle recommence automatiquement avec la nouvelle pièce et la nouvelle bordure
+        # 4. Vérifie si la nouvelle pièce peut être placée (game over)
+        piece = pieces.tetros[piece_id]["rotations"][rotation]
+        for i in range(4):
+            for j in range(4):
+                if piece[i][j]:
+                    grid_y = piece_pos_y + i
+                    grid_x = piece_pos_x + j
+                    if grid_y < 0:
+                        continue
+                    if grid_y >= grid_height or grid_cells[grid_y][grid_x] != 0:
+                        en_cours = False
+                        apprentissage_en_cours = False
+                        break
+            if not en_cours:
+                break
 
 text_gameover = font2.render("Game over", True, BLANC)
 text_rect = text_gameover.get_rect(center=player_pos)
