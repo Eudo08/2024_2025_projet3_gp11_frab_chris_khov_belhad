@@ -2,7 +2,8 @@ import pygame
 import random
 import pieces
 import utils
-
+import time
+import copy
 
 
 pygame.init()
@@ -326,79 +327,107 @@ init_grid()
 piece_pos_x = Q_table()
 origine_x = grid_centerX
 origine_y = grid_centerY
+
+
+
 while en_cours:
+    # Affichage
+    fenetre.fill(NOIR)
+    draw_grid()
+    draw_locked_cells()
+    dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
+    score_text = font.render(f"score: {score}", True, BLANC)
+    fenetre.blit(score_text, (10, 10))
+    pygame.display.flip()
+
+    # 1. Bloc au centre
+    piece_pos_x = (grid_width // 2) - 1
+    piece_pos_y = 0
+
+    # 2. Boucle d'entraînement Q-table toutes les 100 ms
+    bordure = matrice_bordure_superieure()
+    if not utils.matrice_deja_presente(dico_bordures, bordure):
+        utils.enregistrer_bordure(dico_bordures, etat_id, bordure, grid_width)
+        utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
+    for k, v in dico_bordures.items():
+        if v["bordure"] == bordure:
+            etat_id = int(k)
+            break
+
+    Q = dico_bordures[str(etat_id)]["Q_table"]
+
+    converged = False
+    while not converged:
+        # Réinitialise la Q-table toutes les 100 ms
+        Q = [0.0 for _ in range(grid_width)]
+        dico_bordures[str(etat_id)]["Q_table"] = Q
+
+        for _ in range(10):  # 10 updates rapides
+            action = Q_table()  # Choisit la colonne selon la Q-table
+
+            # Simule la pose de la pièce à la colonne 'action' sur une copie de la grille
+            grille_temp = copy.deepcopy(grid_cells)
+            ancienne_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
+
+            piece = pieces.tetros[piece_id]["rotations"][rotation]
+            for i in range(4):
+                for j in range(4):
+                    if piece[i][j]:
+                        grid_y = i
+                        grid_x = action + j
+                        if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
+                            grille_temp[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+
+            # Supprime les lignes pleines sur la grille temporaire
+            lignes_supprimees = 0
+            i = grid_height - 1
+            while i >= 0:
+                if all(grille_temp[i][j] != 0 for j in range(grid_width)):
+                    del grille_temp[i]
+                    grille_temp.insert(0, [0] * grid_width)
+                    lignes_supprimees += 1
+                else:
+                    i -= 1
+
+            nouvelle_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
+            game_over = any(grille_temp[0][col] != 0 for col in range(grid_width))
+
+            reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur)
+            update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
+
+        # Vérifie si une proba dépasse 0,80
+        maxQ = max(Q)
+        if maxQ > 0.80:
+            converged = True
+        else:
+            pygame.time.wait(100)  # Attend 100 ms
+
+    # 3. Pose la pièce selon la Q-table
+    meilleure_action = Q.index(max(Q))
+    piece_pos_x = meilleure_action
+    # Pose la pièce dans la grille
+    piece = pieces.tetros[piece_id]["rotations"][rotation]
+    for i in range(4):
+        for j in range(4):
+            if piece[i][j]:
+                grid_y = piece_pos_y + i
+                grid_x = piece_pos_x + j
+                if grid_y >= 0:
+                    grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+
+    lignes_supprimees = supprimer_lignes()
+    score += lignes_supprimees * 100
+
+    # Nouvelle pièce pour la prochaine boucle
+    piece_id = 2
+    rotation = 0
+    # La boucle recommence
+
+    # Gère les événements pygame pour pouvoir fermer la fenêtre
     for evenement in pygame.event.get():
         if evenement.type == pygame.QUIT:
             en_cours = False
 
-        
-        # elif evenement.type == pygame.KEYDOWN:
-        #     if evenement.key == pygame.K_SPACE:
-        #         new_rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
-        #         new_piece = pieces.tetros[piece_id]["rotations"][new_rotation]
-
-        #         valide = True
-        #         for i in range(4):
-        #             for j in range(4):
-        #                 if new_piece[i][j]:
-        #                     x = piece_pos_x + j
-        #                     y = piece_pos_y + i
-
-        #                     if x < 0 or x >= grid_width or y >= grid_height:
-        #                         valide = False
-        #                         break  
-        #                     elif y >= 0 and grid_cells[y][x] != 0:
-        #                         valide = False
-        #                         break 
-        #             if not valide:
-        #                 break  
-        #         if valide:
-        #             rotation = new_rotation
-
-        #     elif evenement.key == pygame.K_ESCAPE:
-        #         en_cours = False
-        #     elif evenement.key == pygame.K_LEFT:
-        #         piece_pos_x -= 1
-        #         piece = pieces.tetros[piece_id]["rotations"][rotation]
-        #         for i in range(4):
-        #             for j in range(4):
-        #                 if piece[i][j]:
-        #                     new_x = piece_pos_x + j
-        #                     new_y = piece_pos_y + i
-        #                     if new_x < 0 or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
-        #                         piece_pos_x += 1  
-        #                         break
-        #     elif evenement.key == pygame.K_RIGHT:
-        #         piece_pos_x += 1
-        #         piece = pieces.tetros[piece_id]["rotations"][rotation]
-        #         for i in range(4):
-        #             for j in range(4):
-        #                 if piece[i][j]:
-        #                     new_x = piece_pos_x + j
-        #                     new_y = piece_pos_y + i
-        #                     if new_x >= grid_width or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
-        #                         piece_pos_x -= 1  # annule le déplacement
-    if not en_cours:
-        text_gameover = font2.render("GAME OVER", True, ROUGE)
-        text_rect = text_gameover.get_rect(center=(largeur // 2, hauteur // 2))
-        fenetre.blit(text_gameover, text_rect)
-    #                         break
-
-
-
-
-
-    fenetre.fill(NOIR)
-    draw_grid()
-
-    draw_locked_cells()
-    dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
-
-    dt = clock.tick(30) 
-    next_drop(dt)
-    score_text = font.render(f"score: {score}", True, BLANC)
-    fenetre.blit(score_text, (10, 10))
-    pygame.display.flip()
 
 
 
