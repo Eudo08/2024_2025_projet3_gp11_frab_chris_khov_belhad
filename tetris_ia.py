@@ -4,6 +4,7 @@ import pieces
 import utils
 
 
+
 pygame.init()
 
 
@@ -32,7 +33,7 @@ grid_cells = []
 grid_centerX = 0
 grid_centerY = 0
 piece_pos_x = grid_width // 2 - 2
-piece_pos_y = -1
+piece_pos_y = 0
 gravity_time = 200
 timerdrop = gravity_time
 player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
@@ -82,14 +83,14 @@ ROUGE = (255, 0, 0)
 piece_id = 2
 rotation = 0
 
-def set_gravity_time_5min():
+def set_gravity_time():
     global gravity_time, timerdrop
     # Vérifie si la Q-table de l'état courant existe déjà
     bordure = matrice_bordure_superieure()
     if utils.matrice_deja_presente(dico_bordures, bordure):
         gravity_time = 200  # Temps normal si Q-table déjà connue
     else:
-        gravity_time = 300000
+        gravity_time = 10000
 
 
 
@@ -97,7 +98,7 @@ def nouvelle_piece():
     global piece_id, rotation, piece_pos_x
     piece_id = 2
     rotation = 0
-    set_gravity_time_5min()
+    set_gravity_time()
     piece_pos_x = Q_table()
 
 
@@ -145,7 +146,17 @@ def Q_table():
     Choisit la colonne selon la Q-table de l'état courant (bordure).
     Avec epsilon, fait parfois un choix aléatoire (exploration).
     """
-    global dico_bordures, grid_width, piece_pos_x
+    global dico_bordures, grid_width, piece_pos_x, etat_id
+
+    bordure = matrice_bordure_superieure()
+    if not utils.matrice_deja_presente(dico_bordures, bordure):
+        utils.enregistrer_bordure(dico_bordures, etat_id, bordure, grid_width)
+        utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
+    # Trouve le bon etat_id pour la bordure courante
+    for k, v in dico_bordures.items():
+        if v["bordure"] == bordure:
+            etat_id = int(k)
+            break
 
     Q = dico_bordures[str(etat_id)]["Q_table"]
     # Politique epsilon-greedy
@@ -244,7 +255,7 @@ def next_drop(dt):
             # Nouvelle pièce
             nouvelle_piece()
             piece_pos_x = Q_table()
-            piece_pos_y = -1
+            piece_pos_y = 0
 
              # Vérifie si la nouvelle pièce peut être placée
             piece = pieces.tetros[piece_id]["rotations"][rotation]
