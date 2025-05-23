@@ -358,11 +358,12 @@ while en_cours:
 
     converged = False
     while not converged:
-        # Réinitialise la Q-table toutes les 100 ms
-        Q = [0.0 for _ in range(grid_width)]
-        dico_bordures[str(etat_id)]["Q_table"] = Q
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                en_cours = False
+                converged = True  # Pour sortir proprement de la boucle d'apprentissage
 
-        for _ in range(10):  # 10 updates rapides
+        for _ in range(100):  # 10 updates rapides
             action = Q_table()  # Choisit la colonne selon la Q-table
 
             # Simule la pose de la pièce à la colonne 'action' sur une copie de la grille
@@ -418,6 +419,9 @@ while en_cours:
     lignes_supprimees = supprimer_lignes()
     score += lignes_supprimees * 100
 
+     # === SAUVEGARDE DE LA Q-TABLE DÉFINITIVE ===
+    utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
+
     # Nouvelle pièce pour la prochaine boucle
     piece_id = 2
     rotation = 0
@@ -445,10 +449,6 @@ for k, v in dico_bordures.items():
         print(row)
     print("-" * 30)
 
-
-
-utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
-print("Dictionnaire des bordures sauvegardé dans bordures.json")
 
 
 
