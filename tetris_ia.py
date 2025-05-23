@@ -33,9 +33,15 @@ grid_cells = []
 grid_centerX = 0
 grid_centerY = 0
 piece_pos_x = grid_width // 2 - 2
+<<<<<<< Updated upstream
 piece_pos_y = -1
 gravity_time = 200
 timerdrop = gravity_time
+=======
+piece_pos_y = 0
+ 
+# timerdrop = gravity_time
+>>>>>>> Stashed changes
 player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
 fenetre = pygame.display.set_mode((largeur, hauteur))
 pygame.display.set_caption("Tetris")
