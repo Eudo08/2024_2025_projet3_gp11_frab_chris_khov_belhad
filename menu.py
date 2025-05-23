@@ -18,10 +18,19 @@ pygame.display.set_caption("Tetris")
 font = pygame.font.Font("assets/font/Drawliner.ttf",30)
 img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
+
 img_ia = pygame.image.load ('image/tetris_ia.png')
-petit_img_ia = pygame.transform.scale(img_ia, (img_ia.get_width() // 3, img_ia.get_height() // 3))
-img_j = pygame.image.load ('image/tetris_ia.png')
-petit_img_j = pygame.transform.scale(img_j, (img_j.get_width() // 3, img_j.get_height() // 3))
+# petit_img_ia = pygame.transform.scale(img_ia, (img_ia.get_width() // 3, img_ia.get_height() // 3))
+position_img_ia = (450, 150)
+new_sise = (100, 100)
+new_img_ia = pygame.transform.scale(img_ia, new_sise)
+
+
+img_j = pygame.image.load ('image/tetris_j.jpg')
+# petit_img_j = pygame.transform.scale(img_j, (img_j.get_width() // 3, img_j.get_height() // 3))
+position_img_j = (150, 150)
+new_img_j = pygame.transform.scale(img_j, new_sise)
+
 
 player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 
@@ -46,6 +55,8 @@ def show_menu():
         texte = font.render("TETRIS", True, BLANC) 
         texte_rect = texte.get_rect(center=player_pos)
         ecran.blit(texte, texte_rect)
+        ecran.blit(new_img_ia, position_img_ia)
+        ecran.blit(new_img_j, position_img_j)
 
         mouse_pos = pygame.mouse.get_pos ()
         mouse_clicked = False
