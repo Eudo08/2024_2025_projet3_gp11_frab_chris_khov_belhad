@@ -11,8 +11,12 @@ def charger_dico_json(nom_fichier):
     else:
         return {}
     
-def enregistrer_bordure(dico, etat_id, matrice):
-    dico[etat_id] = matrice
+def enregistrer_bordure(dico_bordures, etat_id, bordure, grid_width):
+    nb_actions = grid_width - 1  # Pour un carré 2x2
+    dico_bordures[str(etat_id)] = {
+        "bordure": bordure,
+        "Q_table": [0.0 for _ in range(nb_actions)]
+        }
 
 def sauvegarder_dico_json(dico, nom_fichier):
     with open(nom_fichier, "w") as f:
