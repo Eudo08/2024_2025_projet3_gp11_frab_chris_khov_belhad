@@ -19,7 +19,7 @@ largeur = 800
 hauteur = 600
 taille_bloc = 25
 score = 0
-font = pygame.font.Font("assets/font/Drawliner.ttf",30)
+font = pygame.font.Font("assets/font/Drawliner.ttf", 30)
 font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
 # font = pygame.font.SysFont("Drawliner", 30)
 epsilon = 0.1
@@ -78,6 +78,7 @@ NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)
 GRIS = (193, 193, 193)
 BLEU = (0, 150, 255)
+ROUGE = (255, 0, 0)
 
 piece_id = 2
 rotation = 0
@@ -312,6 +313,8 @@ while en_cours:
     for evenement in pygame.event.get():
         if evenement.type == pygame.QUIT:
             en_cours = False
+
+        
         # elif evenement.type == pygame.KEYDOWN:
         #     if evenement.key == pygame.K_SPACE:
         #         new_rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
@@ -358,7 +361,11 @@ while en_cours:
         #                     new_y = piece_pos_y + i
         #                     if new_x >= grid_width or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
         #                         piece_pos_x -= 1  # annule le déplacement
-        #                         break
+    if not en_cours:
+        text_gameover = font2.render("GAME OVER", True, ROUGE)
+        text_rect = text_gameover.get_rect(center=(largeur // 2, hauteur // 2))
+        fenetre.blit(text_gameover, text_rect)
+    #                         break
 
 
 
@@ -376,10 +383,7 @@ while en_cours:
     fenetre.blit(score_text, (10, 10))
     pygame.display.flip()
 
-text_gameover = font2.render("Game over", True, BLANC)
-text_rect = text_gameover.get_rect(center=player_pos)
-fenetre.blit(text_gameover, text_rect)
-pygame.display.flip()
+
 
 attente = True
 while attente:
