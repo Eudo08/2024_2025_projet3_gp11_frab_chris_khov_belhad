@@ -19,9 +19,8 @@ largeur = 800
 hauteur = 600
 taille_bloc = 25
 score = 0
-font = pygame.font.Font("assets/font/Drawliner.ttf",30)
+font = pygame.font.Font("assets/font/Drawliner.ttf", 30)
 font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
-# font = pygame.font.SysFont("Drawliner", 30)
 epsilon = 0.1
 alpha=0.1
 gamma=0.9
@@ -78,43 +77,52 @@ NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)
 GRIS = (193, 193, 193)
 BLEU = (0, 150, 255)
+ROUGE = (255, 0, 0)
 
 piece_id = 2
 rotation = 0
 
+def set_gravity_time_5min():
+    global gravity_time, timerdrop
+    # Vérifie si la Q-table de l'état courant existe déjà
+    bordure = matrice_bordure_superieure()
+    if utils.matrice_deja_presente(dico_bordures, bordure):
+        gravity_time = 200  # Temps normal si Q-table déjà connue
+    else:
+        gravity_time = 300000
+
+
+
 def nouvelle_piece():
-    global piece_id, rotation
+    global piece_id, rotation, piece_pos_x
     piece_id = 2
     rotation = 0
+    set_gravity_time_5min()
+    piece_pos_x = Q_table()
 
-def state_of_object ():
-    pass
 
-def matrice_envrionnement ():
-    pass
+# def action_to_do():
+#     """
+#     Choisit une colonne au hasard pour placer la pièce courante, en tenant compte de sa largeur réelle et de son décalage.
+#     """
+#     global piece_pos_x, piece_id, rotation
+#     piece = pieces.tetros[piece_id]["rotations"][rotation]
 
-def action_to_do():
-    """
-    Choisit une colonne au hasard pour placer la pièce courante, en tenant compte de sa largeur réelle et de son décalage.
-    """
-    global piece_pos_x, piece_id, rotation
-    piece = pieces.tetros[piece_id]["rotations"][rotation]
+#     # Trouver les colonnes occupées par la pièce
+#     colonnes_occupees = [j for i in range(4) for j in range(4) if piece[i][j]]
+#     if not colonnes_occupees:
+#         piece_pos_x = 0
+#         return
 
-    # Trouver les colonnes occupées par la pièce
-    colonnes_occupees = [j for i in range(4) for j in range(4) if piece[i][j]]
-    if not colonnes_occupees:
-        piece_pos_x = 0
-        return
+#     min_col = min(colonnes_occupees)
+#     max_col = max(colonnes_occupees)
+#     largeur_piece = max_col - min_col + 1
 
-    min_col = min(colonnes_occupees)
-    max_col = max(colonnes_occupees)
-    largeur_piece = max_col - min_col + 1
+#     # Pour permettre à la pièce de toucher le bord gauche ET droit
+#     min_x = -min_col
+#     max_x = grid_width - 1 - max_col
 
-    # Pour permettre à la pièce de toucher le bord gauche ET droit
-    min_x = -min_col
-    max_x = grid_width - 1 - max_col
-
-    piece_pos_x = random.randint(min_x, max_x)
+#     piece_pos_x = random.randint(min_x, max_x)
 
 def calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur):
     """
@@ -229,14 +237,13 @@ def next_drop(dt):
             print("-" * 30)
             bordure = matrice_bordure_superieure()
             if not utils.matrice_deja_presente(dico_bordures, bordure):
-                utils.enregistrer_bordure(dico_bordures, etat_id, bordure)
                 utils.enregistrer_bordure(dico_bordures, etat_id, bordure, grid_width)
                 etat_id += 1 
 
 
             # Nouvelle pièce
             nouvelle_piece()
-            action_to_do()
+            piece_pos_x = Q_table()
             piece_pos_y = -1
 
              # Vérifie si la nouvelle pièce peut être placée
@@ -305,13 +312,15 @@ def supprimer_lignes():
 en_cours = True
 clock = pygame.time.Clock()
 init_grid()
-action_to_do()
+piece_pos_x = Q_table()
 origine_x = grid_centerX
 origine_y = grid_centerY
 while en_cours:
     for evenement in pygame.event.get():
         if evenement.type == pygame.QUIT:
             en_cours = False
+
+        
         # elif evenement.type == pygame.KEYDOWN:
         #     if evenement.key == pygame.K_SPACE:
         #         new_rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
@@ -358,7 +367,11 @@ while en_cours:
         #                     new_y = piece_pos_y + i
         #                     if new_x >= grid_width or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
         #                         piece_pos_x -= 1  # annule le déplacement
-        #                         break
+    if not en_cours:
+        text_gameover = font2.render("GAME OVER", True, ROUGE)
+        text_rect = text_gameover.get_rect(center=(largeur // 2, hauteur // 2))
+        fenetre.blit(text_gameover, text_rect)
+    #                         break
 
 
 
@@ -376,10 +389,7 @@ while en_cours:
     fenetre.blit(score_text, (10, 10))
     pygame.display.flip()
 
-text_gameover = font2.render("Game over", True, BLANC)
-text_rect = text_gameover.get_rect(center=player_pos)
-fenetre.blit(text_gameover, text_rect)
-pygame.display.flip()
+
 
 attente = True
 while attente:
