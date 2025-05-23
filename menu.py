@@ -15,20 +15,18 @@ ROUGE = (255, 0, 0)
 
 ecran = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Tetris")
-font = pygame.font.Font("assets/font/Drawliner.ttf",30)
+font = pygame.font.Font("assets/font/Drawliner.ttf",130)
 img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
 
 img_ia = pygame.image.load ('image/tetris_ia.png')
-# petit_img_ia = pygame.transform.scale(img_ia, (img_ia.get_width() // 3, img_ia.get_height() // 3))
-position_img_ia = (450, 150)
-new_sise = (100, 100)
+position_img_ia = (470, 260)
+new_sise = (160, 160)
 new_img_ia = pygame.transform.scale(img_ia, new_sise)
 
 
 img_j = pygame.image.load ('image/tetris_j.jpg')
-# petit_img_j = pygame.transform.scale(img_j, (img_j.get_width() // 3, img_j.get_height() // 3))
-position_img_j = (150, 150)
+position_img_j = (170, 260)
 new_img_j = pygame.transform.scale(img_j, new_sise)
 
 
@@ -44,8 +42,8 @@ def show_menu():
 
     start_x = ecran.get_width() / 2 - ecran.get_height() / 2
 
-    ia_button = Button("IA", start_x, 200, button_width, button_height, button_color, hover_color)
-    player_button = Button ("Jouer !", start_x, 200, button_width, button_height, button_color, hover_color)
+    ia_button = Button("IA", 450, 450, button_width, button_height, button_color, hover_color)
+    player_button = Button ("Jouer !", 150, 450, button_width, button_height, button_color, hover_color)
 
     running = True
 
