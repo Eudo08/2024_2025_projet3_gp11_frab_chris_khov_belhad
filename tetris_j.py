@@ -10,7 +10,7 @@ hauteur = 600
 taille_bloc = 25
 score = 0
 font = pygame.font.Font("assets/font/Drawliner.ttf",30)
-# font = pygame.font.SysFont("Drawliner", 30)
+font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
 grid = []
 grid_height = 20
 grid_width = 10
@@ -22,6 +22,7 @@ piece_pos_x = grid_width // 2 - 2
 piece_pos_y = -1
 gravity_time = 1
 timerdrop = gravity_time
+player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
 
 def init_grid():
     global grid_cellsize, grid_cells, grid_centerX, grid_centerY
@@ -258,7 +259,7 @@ while en_cours:
             #                     break
 
 
-
+    
 
     fenetre.fill(NOIR)
     draw_grid()
@@ -273,4 +274,19 @@ while en_cours:
     fenetre.blit(score_text, (10, 10))
     pygame.display.flip()
     clock.tick(5)
+
+text_gameover = font2.render("Game over", True, BLANC)
+text_rect = text_gameover.get_rect(center=player_pos)
+fenetre.blit(text_gameover, text_rect)
+pygame.display.flip()
+
+attente = True
+while attente:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            attente = False
+
+
+
+pygame.quit()
 pygame.quit ()
