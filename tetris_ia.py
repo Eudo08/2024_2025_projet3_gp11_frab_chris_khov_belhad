@@ -211,12 +211,18 @@ def trouver_hauteur_finale(piece, x, grid):
             return y - 1  # Last safe position before collision
     return grid_height - len(piece)  # If no collision, go to the bottom
 
+def poser_piece(piece, x, y, grille, couleur):
+    for i in range(4):
+        for j in range(4):
+            if piece[i][j]:
+                grid_y = y + i
+                grid_x = x + j
+                if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
+                    grille[grid_y][grid_x] = couleur
 
 def next_drop(dt):
     global timerdrop, piece_pos_y, piece_pos_x, score, etat_id, en_cours
 
-    # timerdrop -= dt
-    # if timerdrop <= 0:
     piece = pieces.tetros[piece_id]["rotations"][rotation]
     can_move = True
     for i in range(4):
@@ -233,14 +239,7 @@ def next_drop(dt):
     if can_move:
         piece_pos_y += 1
     else:
-        # Pose la pièce
-        for i in range(4):
-            for j in range(4):
-                if piece[i][j]:
-                    grid_y = piece_pos_y + i
-                    grid_x = piece_pos_x + j
-                    if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
-                        grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+        poser_piece(piece, piece_pos_x, piece_pos_y, grid_cells, pieces.tetros[piece_id]["couleur"])
         lignes_supprimees = supprimer_lignes()
         score += lignes_supprimees * 100
 
@@ -250,6 +249,7 @@ def next_drop(dt):
     
         
 def entrainer_IA():
+    global piece_pos_x
     for _ in range(10): 
         action = Q_table()  # Choisit la colonne selon la Q-table
 
@@ -258,22 +258,27 @@ def entrainer_IA():
         ancienne_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
         piece = pieces.tetros[piece_id]["rotations"][rotation]
 
-        collision = False
-        for i in range(4):
-            for j in range(4):
-                if piece[i][j]:
-                    grid_y = i
-                    grid_x = action + j
-                    if (
-                        grid_y >= grid_height or
-                        grid_x < 0 or grid_x >= grid_width or
-                        (grid_y >= 0 and grille_temp[grid_y][grid_x] != 0)
-                    ):
-                        collision = True
-        if collision:
-            # Donne une très mauvaise récompense pour cette action
-            reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=collision)
+        # Vérification collision latérale AVANT de simuler la pose
+        if piece_collides(piece, action, 0, grille_temp):
+            # Collision latérale immédiate : très mauvaise récompense et on passe au test suivant
+            reward = calculer_recompense(
+                game_over=False,
+                lignes_supprimees=0,
+                ancienne_hauteur=ancienne_hauteur,
+                nouvelle_hauteur=ancienne_hauteur,  # pas de changement de hauteur
+                has_collision=True
+            )
             update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
+            continue  # Passe au test suivant
+
+        # Simulation de la pose (descente jusqu'à collision)
+        y = 0
+        while not piece_collides(piece, action, y, grille_temp):
+            y += 1
+        y -= 1  # Dernière position valide
+
+        # Pose la pièce simulée
+        poser_piece(piece, action, y, grille_temp, pieces.tetros[piece_id]["couleur"])
 
         # Calcul des autres variables
         lignes_supprimees = 0
@@ -287,15 +292,12 @@ def entrainer_IA():
                 i -= 1
         nouvelle_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
         game_over = any(grille_temp[0][col] != 0 for col in range(grid_width))
-        reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, has_collision=collision)
+        reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, has_collision=False)
         update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
 
-    # Vérifie si la pièce est à une case de la bordure la plus haute
-    hauteur_max = min(
-        (row for row in range(grid_height) if any(grid_cells[row][col] != 0 for col in range(grid_width))),
-        default=grid_height
-    )
-    if piece_pos_y + 1 >= hauteur_max and not hasattr(next_drop, "colonne_fixee"):
+    piece = pieces.tetros[piece_id]["rotations"][rotation]
+    hauteur_finale = trouver_hauteur_finale(piece, piece_pos_x, grid_cells)
+    if piece_pos_y + 1 >= hauteur_finale and not hasattr(next_drop, "colonne_fixee"):
         # Pose la pièce selon la Q-table (choix définitif)
         piece_pos_x = Q_table()
         next_drop.colonne_fixee = True
@@ -308,9 +310,7 @@ def entrainer_IA():
                     if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
                         grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
 
-
-    
-                  
+               
                     
 
 def nouv_tetros():
@@ -365,7 +365,6 @@ def supprimer_lignes():
 en_cours = True
 clock = pygame.time.Clock()
 init_grid()
-piece_pos_x = Q_table()
 origine_x = grid_centerX
 origine_y = grid_centerY
 descente_timer = 0
