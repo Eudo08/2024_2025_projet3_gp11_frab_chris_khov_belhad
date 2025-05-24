@@ -77,6 +77,10 @@ def show_menu():
             running = False
             tetris_ia()
 
+        elif player_button.check_clicked (mouse_pos, mouse_clicked):
+            running = False
+            tetris_j()
+
         pygame.display.flip()
         clock.tick(30)
         
