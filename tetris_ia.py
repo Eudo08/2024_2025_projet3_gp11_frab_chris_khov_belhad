@@ -215,36 +215,37 @@ def trouver_hauteur_finale(piece, x, grid):
 def next_drop(dt):
     global timerdrop, piece_pos_y, piece_pos_x, score, etat_id, en_cours
 
-    timerdrop -= dt
-    if timerdrop <= 0:
-        piece = pieces.tetros[piece_id]["rotations"][rotation]
-        can_move = True
+    # timerdrop -= dt
+    # if timerdrop <= 0:
+    piece = pieces.tetros[piece_id]["rotations"][rotation]
+    can_move = True
+    for i in range(4):
+        for j in range(4):
+            if piece[i][j]:
+                new_y = piece_pos_y + i + 1
+                new_x = piece_pos_x + j
+                if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+                    can_move = False
+                    break
+        if not can_move:
+            break
+
+    if can_move:
+        piece_pos_y += 1
+    else:
+        # Pose la pièce
         for i in range(4):
             for j in range(4):
                 if piece[i][j]:
-                    new_y = piece_pos_y + i + 1
-                    new_x = piece_pos_x + j
-                    if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
-                        can_move = False
-                        break
-            if not can_move:
-                break
+                    grid_y = piece_pos_y + i
+                    grid_x = piece_pos_x + j
+                    if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
+                        grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+        lignes_supprimees = supprimer_lignes()
+        score += lignes_supprimees * 100
 
-        if can_move:
-            piece_pos_y += 1
-        else:
-            for i in range(4):
-                for j in range(4):
-                    if piece[i][j]:
-                        new_y = piece_pos_y + i + 1
-                        new_x = piece_pos_x + j
-                        if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
-                            can_move = False
-                            break
-                  
-                        
-                if not can_move:
-                    break
+        nouvelle_piece()
+        piece_pos_y = 0
 
     
         
@@ -306,10 +307,6 @@ def entrainer_IA():
                     grid_x = piece_pos_x + j
                     if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
                         grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
-
-        lignes_supprimees = supprimer_lignes()
-        score += lignes_supprimees * 100
-    
 
 
     
@@ -406,13 +403,10 @@ while en_cours:
                 utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
                 en_cours = False
     
-
-    next_drop(dt)
     entrainer_IA()
-    lignes_supprimees = supprimer_lignes()
-    score += lignes_supprimees * 100
-    nouvelle_piece()
-    continue
+    if descente_timer >= descente_intervalle:
+        next_drop(dt)
+        descente_timer = 0
     
 
 
