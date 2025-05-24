@@ -126,7 +126,7 @@ def nouvelle_piece():
 
 #     piece_pos_x = random.randint(min_x, max_x)
 
-def calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur):
+def calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=False):
     """
     Calcule la récompense pour l'IA :
     - -50 si game over
@@ -425,7 +425,7 @@ while en_cours:
     for _ in range(100): 
         action = Q_table()  # Choisit la colonne selon la Q-table
 
-            # Simule la pose de la pièce à la colonne 'action' sur une copie de la grille
+        # Simule la pose de la pièce à la colonne 'action' sur une copie de la grille
         grille_temp = copy.deepcopy(grid_cells)
         ancienne_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
         piece = pieces.tetros[piece_id]["rotations"][rotation]
@@ -449,6 +449,7 @@ while en_cours:
             update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
             continue
 
+
         for i in range(4):
             for j in range(4):
                 if piece[i][j]:
@@ -467,18 +468,16 @@ while en_cours:
                 lignes_supprimees += 1
             else:
                 i -= 1
-    
+        nouvelle_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
+        game_over = any(grille_temp[0][col] != 0 for col in range(grid_width))
+        reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=collision)
+        update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
+        
+
     if descente_timer >= descente_intervalle:
         next_drop(dt)
         descente_timer = 0
 
-    nouvelle_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
-    game_over = any(grille_temp[0][col] != 0 for col in range(grid_width))
-
-    reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur)
-    update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
-
-    next_drop(dt)
 
     # Gère les événements pygame pour pouvoir fermer la fenêtre
     for evenement in pygame.event.get():
