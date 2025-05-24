@@ -144,7 +144,6 @@ def calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle
     return recompense
 
 def Q_table():
-    pass
     """
     Choisit la colonne selon la Q-table de l'état courant (bordure).
     Avec epsilon, fait parfois un choix aléatoire (exploration).
@@ -163,12 +162,33 @@ def Q_table():
 
     Q = dico_bordures[str(etat_id)]["Q_table"]
     # Politique epsilon-greedy
+    if not utils.matrice_deja_presente(dico_bordures, bordure):
+        utils.enregistrer_bordure(dico_bordures, etat_id, bordure, grid_width)
+        utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
+    # Trouve le bon etat_id pour la bordure courante
+    for k, v in dico_bordures.items():
+        if v["bordure"] == bordure:
+            etat_id = int(k)
+            break
+
+    Q = dico_bordures[str(etat_id)]["Q_table"]
+
+    # Politique epsilon-greedy
     if random.random() < epsilon:
-        action = random.randint(0, grid_width - 2)
+        # Exploration : choix uniforme
+        action = random.randint(0, len(Q) - 1)
     else:
-        maxQ = max(Q)
-        actions = [i for i, q in enumerate(Q) if q == maxQ]
-        action = random.choice(actions)
+        # Exploitation : tirage pondéré selon les Q (softmax ou normalisation)
+        Q_min = min(Q)
+        Q_shifted = [q - Q_min + 1e-6 for q in Q]  # Décale pour éviter les valeurs négatives
+        total = sum(Q_shifted)
+        if total == 0:
+            # Si toutes les Q sont égales, choix uniforme
+            proba = [1/len(Q)] * len(Q)
+        else:
+            proba = [q/total for q in Q_shifted]
+        action = random.choices(range(len(Q)), weights=proba, k=1)[0]
+
     piece_pos_x = action
     return action  # Utile pour la mise à jour de la Q-table
 
@@ -215,63 +235,187 @@ def next_drop(dt):
     if timerdrop <= 0:
         piece = pieces.tetros[piece_id]["rotations"][rotation]
         can_move = True
+        if can_move:
+            piece_pos_y += 1
+        else:
+            for i in range(4):
+                for j in range(4):
+                    if piece[i][j]:
+                        new_y = piece_pos_y + i + 1
+                        new_x = piece_pos_x + j
+                        if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+                            can_move = False
+                            break
+                  
+                        
+                if not can_move:
+                    break
+
+        
+        
+    # maxQ = max(Q)
+    # if maxQ > 0.80:
+    #     # Pose la pièce selon la Q-table
+    #     meilleure_action = Q.index(max(Q))
+    #     piece_pos_x = meilleure_action
+    #     piece = pieces.tetros[piece_id]["rotations"][rotation]
+    #     for i in range(4):
+    #         for j in range(4):
+    #             if piece[i][j]:
+    #                 grid_y = piece_pos_y + i
+    #                 grid_x = piece_pos_x + j
+    #                 if grid_y >= 0:
+    #                     grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+
+    #     lignes_supprimees = supprimer_lignes()
+    #     score += lignes_supprimees * 100
+
+    #     utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
+
+    #     # Nouvelle pièce pour la prochaine boucle
+    #     piece_id = 2
+    #     rotation = 0
+    #     # set_gravity_time()
+    #     piece_pos_x = Q_table()
+    #     piece_pos_y = 0 # Passe à la pièce suivante
+
+    # Vérifie si la pièce est à une case de la bordure la plus haute
+    # hauteur_max = min(
+    #     (row for row in range(grid_height) if any(grid_cells[row][col] != 0 for col in range(grid_width))),
+    #     default=grid_height
+    # )
+    # if piece_pos_y + 1 >= hauteur_max:
+    #     # Pose la pièce selon la Q-table (choix définitif)
+    #     meilleure_action = Q.index(max(Q))
+    #     piece_pos_x = meilleure_action
+    #     piece = pieces.tetros[piece_id]["rotations"][rotation]
+    #     for i in range(4):
+    #         for j in range(4):
+    #             if piece[i][j]:
+    #                 grid_y = piece_pos_y + i
+    #                 grid_x = piece_pos_x + j
+    #                 if grid_y >= 0:
+    #                     grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+
+    #     lignes_supprimees = supprimer_lignes()
+    #     score += lignes_supprimees * 100
+
+    #     utils.sauvegarder_dico_json(dico_bordures, "bordures.json")
+
+    #     # Nouvelle pièce pour la prochaine boucle
+    #     piece_id = 2
+    #     rotation = 0
+    #     # set_gravity_time()
+    #     piece_pos_x = Q_table()
+    #     piece_pos_y = 0
+    
+    for _ in range(100): 
+        action = Q_table()  # Choisit la colonne selon la Q-table
+
+        # Simule la pose de la pièce à la colonne 'action' sur une copie de la grille
+        grille_temp = copy.deepcopy(grid_cells)
+        ancienne_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
+        piece = pieces.tetros[piece_id]["rotations"][rotation]
+
+            # Vérifie si la pose est possible (pas de collision)
+        collision = False
+        for i in range(4):
+            for j in range(4):
+                if piece[i][j]:
+                    grid_y = i
+                    grid_x = action + j
+                    if (
+                        grid_y >= grid_height or
+                        grid_x < 0 or grid_x >= grid_width or
+                        (grid_y >= 0 and grille_temp[grid_y][grid_x] != 0)
+                    ):
+                        collision = True
+        if collision:
+            # Donne une très mauvaise récompense pour cette action
+            reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=collision)
+            update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
+
 
         for i in range(4):
             for j in range(4):
                 if piece[i][j]:
-                    new_y = piece_pos_y + i + 1
-                    new_x = piece_pos_x + j
-                    if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
-                        can_move = False
-                        break
+                    grid_y = i
+                    grid_x = action + j
+                    if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
+                        grille_temp[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+
+        # Supprime les lignes pleines sur la grille temporaire
+        lignes_supprimees = 0
+        i = grid_height - 1
+        while i >= 0:
+            if all(grille_temp[i][j] != 0 for j in range(grid_width)):
+                del grille_temp[i]
+                grille_temp.insert(0, [0] * grid_width)
+                lignes_supprimees += 1
+            else:
+                i -= 1
+        nouvelle_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
+        game_over = any(grille_temp[0][col] != 0 for col in range(grid_width))
+        reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=collision)
+        update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
+
+        # if can_move:
+        #     piece_pos_y += 1
+        # else:
+        #     # Fixer la pièce dans la grille
+        #     for i in range(4):
+        #         for j in range(4):
+        #             if piece[i][j]:
+        #                 grid_y = piece_pos_y + i
+        #                 grid_x = piece_pos_x + j
+        #                 if grid_y >= 0:
+        #                     grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+                    
+        #     lignes_supprimees = supprimer_lignes()
+        #     score += lignes_supprimees * 100
+
+            # # Affichage de la bordure supérieure à chaque pose de bloc
+            # bordure = matrice_bordure_superieure()
+            # for row in bordure:
+            #     print(row)
+            # print("-" * 30)
+            # bordure = matrice_bordure_superieure()
+            # if not utils.matrice_deja_presente(dico_bordures, bordure):
+            #     utils.enregistrer_bordure(dico_bordures, etat_id, bordure, grid_width)
+            #     etat_id += 1 
+
+
+        #     # Nouvelle pièce
+        #     nouvelle_piece()
+        #     piece_pos_x = Q_table()
+        #     piece_pos_y = 0
+
+        #      # Vérifie si la nouvelle pièce peut être placée
+        #     piece = pieces.tetros[piece_id]["rotations"][rotation]
+        #     for i in range(4):
+        #         for j in range(4):
+        #             if piece[i][j]:
+        #                 grid_y = piece_pos_y + i
+        #                 grid_x = piece_pos_x + j
+        #                 if grid_y >= 0 and grid_y < grid_height and grid_cells[grid_y][grid_x] != 0:
+        #                     en_cours = False  # Fin du jeu
+
+        # timerdrop = gravity_time
+        # if can_move:
+        #     piece_pos_y += 1
+        # else:
+        #     for i in range(4):
+        #         for j in range(4):
+        #             if piece[i][j]:
+        #                 new_y = piece_pos_y + i + 1
+        #                 new_x = piece_pos_x + j
+        #                 if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+        #                     can_move = False
+        #                     break
                   
                         
-            if not can_move:
-                break
-
-        if can_move:
-            piece_pos_y += 1
-        else:
-            # Fixer la pièce dans la grille
-            for i in range(4):
-                for j in range(4):
-                    if piece[i][j]:
-                        grid_y = piece_pos_y + i
-                        grid_x = piece_pos_x + j
-                        if grid_y >= 0:
-                            grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
-                    
-            lignes_supprimees = supprimer_lignes()
-            score += lignes_supprimees * 100
-
-            # Affichage de la bordure supérieure à chaque pose de bloc
-            bordure = matrice_bordure_superieure()
-            for row in bordure:
-                print(row)
-            print("-" * 30)
-            bordure = matrice_bordure_superieure()
-            if not utils.matrice_deja_presente(dico_bordures, bordure):
-                utils.enregistrer_bordure(dico_bordures, etat_id, bordure, grid_width)
-                etat_id += 1 
-
-
-            # Nouvelle pièce
-            nouvelle_piece()
-            piece_pos_x = Q_table()
-            piece_pos_y = 0
-
-             # Vérifie si la nouvelle pièce peut être placée
-            piece = pieces.tetros[piece_id]["rotations"][rotation]
-            for i in range(4):
-                for j in range(4):
-                    if piece[i][j]:
-                        grid_y = piece_pos_y + i
-                        grid_x = piece_pos_x + j
-                        if grid_y >= 0 and grid_y < grid_height and grid_cells[grid_y][grid_x] != 0:
-                            en_cours = False  # Fin du jeu
-
-        timerdrop = gravity_time
-
+        #         if not can_move:
+        #             break
 
 
 def nouv_tetros():
@@ -362,7 +506,7 @@ while en_cours:
 
     Q = dico_bordures[str(etat_id)]["Q_table"]
 
-    
+    next_drop(dt)
 
     maxQ = max(Q)
     if maxQ > 0.80:
@@ -406,7 +550,7 @@ while en_cours:
                 if piece[i][j]:
                     grid_y = piece_pos_y + i
                     grid_x = piece_pos_x + j
-                    if grid_y >= 0:
+                    if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
                         grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
 
         lignes_supprimees = supprimer_lignes()
@@ -417,66 +561,66 @@ while en_cours:
         # Nouvelle pièce pour la prochaine boucle
         piece_id = 2
         rotation = 0
-        # set_gravity_time()
         piece_pos_x = Q_table()
         piece_pos_y = 0
         continue
     
-    for _ in range(100): 
-        action = Q_table()  # Choisit la colonne selon la Q-table
+    # for _ in range(100): 
+    #     action = Q_table()  # Choisit la colonne selon la Q-table
 
-        # Simule la pose de la pièce à la colonne 'action' sur une copie de la grille
-        grille_temp = copy.deepcopy(grid_cells)
-        ancienne_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
-        piece = pieces.tetros[piece_id]["rotations"][rotation]
+    #     # Simule la pose de la pièce à la colonne 'action' sur une copie de la grille
+    #     grille_temp = copy.deepcopy(grid_cells)
+    #     ancienne_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
+    #     piece = pieces.tetros[piece_id]["rotations"][rotation]
 
-            # Vérifie si la pose est possible (pas de collision)
-        collision = False
-        for i in range(4):
-            for j in range(4):
-                if piece[i][j]:
-                    grid_y = i
-                    grid_x = action + j
-                    if (
-                        grid_y >= grid_height or
-                        grid_x < 0 or grid_x >= grid_width or
-                        (grid_y >= 0 and grille_temp[grid_y][grid_x] != 0)
-                    ):
-                        collision = True
-        if collision:
-            # Donne une très mauvaise récompense pour cette action
-            reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=collision)
-            update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
-            continue
+    #         # Vérifie si la pose est possible (pas de collision)
+    #     collision = False
+    #     for i in range(4):
+    #         for j in range(4):
+    #             if piece[i][j]:
+    #                 grid_y = i
+    #                 grid_x = action + j
+    #                 if (
+    #                     grid_y >= grid_height or
+    #                     grid_x < 0 or grid_x >= grid_width or
+    #                     (grid_y >= 0 and grille_temp[grid_y][grid_x] != 0)
+    #                 ):
+    #                     collision = True
+    #     if collision:
+    #         # Donne une très mauvaise récompense pour cette action
+    #         reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=collision)
+    #         update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
+    #         continue
 
 
-        for i in range(4):
-            for j in range(4):
-                if piece[i][j]:
-                    grid_y = i
-                    grid_x = action + j
-                    if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
-                        grille_temp[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+    #     for i in range(4):
+    #         for j in range(4):
+    #             if piece[i][j]:
+    #                 grid_y = i
+    #                 grid_x = action + j
+    #                 if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
+    #                     grille_temp[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
 
-        # Supprime les lignes pleines sur la grille temporaire
-        lignes_supprimees = 0
-        i = grid_height - 1
-        while i >= 0:
-            if all(grille_temp[i][j] != 0 for j in range(grid_width)):
-                del grille_temp[i]
-                grille_temp.insert(0, [0] * grid_width)
-                lignes_supprimees += 1
-            else:
-                i -= 1
-        nouvelle_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
-        game_over = any(grille_temp[0][col] != 0 for col in range(grid_width))
-        reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=collision)
-        update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
-        
+    #     # Supprime les lignes pleines sur la grille temporaire
+    #     lignes_supprimees = 0
+    #     i = grid_height - 1
+    #     while i >= 0:
+    #         if all(grille_temp[i][j] != 0 for j in range(grid_width)):
+    #             del grille_temp[i]
+    #             grille_temp.insert(0, [0] * grid_width)
+    #             lignes_supprimees += 1
+    #         else:
+    #             i -= 1
+    #     nouvelle_hauteur = max((row for row in range(grid_height) if any(grille_temp[row][col] != 0 for col in range(grid_width))), default=-1) + 1
+    #     game_over = any(grille_temp[0][col] != 0 for col in range(grid_width))
+    #     reward = calculer_recompense(game_over, lignes_supprimees, ancienne_hauteur, nouvelle_hauteur, collision=collision)
+    #     update_Q_table(etat_id, action, reward, etat_id, alpha, gamma)
+    
+    # next_drop(dt)
 
-    if descente_timer >= descente_intervalle:
-        next_drop(dt)
-        descente_timer = 0
+    # if descente_timer >= descente_intervalle:
+    #     next_drop(dt)
+    #     descente_timer = 0
 
 
     # Gère les événements pygame pour pouvoir fermer la fenêtre
