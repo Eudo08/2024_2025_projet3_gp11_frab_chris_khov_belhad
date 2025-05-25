@@ -19,7 +19,7 @@ L’IA analyse les décisions prises lors de multiples parties pour apprendre à
 **utils.py** : gestion du json    
 **tools.py** : fonction boutton    
 **menu.py** : lancement du menu permettant de choisir le mode de jeu   
-**bordures.json** :    
+**bordures.json** : dictionnaire permettant de stocker les entrainements de l'ia  
 **pieces.py** : éfinition des pièces, rotations et couleurs   
 
 
