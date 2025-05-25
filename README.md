@@ -14,13 +14,13 @@ L’IA analyse les décisions prises lors de multiples parties pour apprendre à
 
 
 ### Structure du Projet
-**tetris_ia.py** : lancement du jeu (ia)
-**tetris_j.py** : lancement du jeu (joueur)
-**utils.py** : gestion du json
-**tools.py** : fonction boutton
-**menu.py** : lancement du menu permettant de choisir le mode de jeu
-**bordures.json** : 
-**pieces.py** : éfinition des pièces, rotations et couleurs
+**tetris_ia.py** : lancement du jeu (ia) 
+**tetris_j.py** : lancement du jeu (joueur) 
+**utils.py** : gestion du json 
+**tools.py** : fonction boutton 
+**menu.py** : lancement du menu permettant de choisir le mode de jeu 
+**bordures.json** :  
+**pieces.py** : éfinition des pièces, rotations et couleurs 
 
 
 ### Fonctionnalités
