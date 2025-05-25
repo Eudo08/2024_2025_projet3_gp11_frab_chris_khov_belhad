@@ -12,27 +12,28 @@ BLANC = (255, 255, 255)
 ORANGE = (255, 73, 1)
 ROUGE = (255, 0, 0)
 
+# Initialisation de la fenêtre
 ecran = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Tetris")
 font = pygame.font.Font("assets/font/Drawliner.ttf",130)
 img = pygame.image.load('image/tetris.jfif')
 pygame.display.set_icon(img)
 
+# Images illustratives
 img_ia = pygame.image.load ('image/tetris_ia.png')
 position_img_ia = (470, 260)
 new_sise = (160, 160)
 new_img_ia = pygame.transform.scale(img_ia, new_sise)
-
-
 img_j = pygame.image.load ('image/tetris_j.jpg')
 position_img_j = (170, 260)
 new_img_j = pygame.transform.scale(img_j, new_sise)
 
-
+# Position du texte
 player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 
 clock = pygame.time.Clock()
 
+# Fonction pour afficher le menu principal
 def show_menu(): 
 
     button_color = (ROUGE)
@@ -46,6 +47,7 @@ def show_menu():
 
     running = True
 
+    # Boucle principale du menu
     while running:
         ecran.fill(NOIR)
 
@@ -55,6 +57,7 @@ def show_menu():
         ecran.blit(new_img_ia, position_img_ia)
         ecran.blit(new_img_j, position_img_j)
 
+        # Dection de la souris
         mouse_pos = pygame.mouse.get_pos ()
         mouse_clicked = False
 
@@ -65,7 +68,8 @@ def show_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mouse_clicked = True
-
+        
+        # Création des boutons
         ia_button.update(mouse_pos)
         player_button.update(mouse_pos)
 
