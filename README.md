@@ -53,15 +53,12 @@ python menu.py
 
 
 ### Modules et fonctions 
-- #### Initialisation de base  
-- #### initialisation de la grille  
-- #### affichage   
-- #### paramètres et fonctions d'aide  
-- #### boucle principale du jeu
-- #### game over (uniquement mode joueur)
-
-
-### Exemple
+- #### Initialisation de base : fixation des variables comme taille de la fenêtre, les couleurs disponibles, et pour l'IA les variables alpha, gamma et epsilon de la Q_table 
+- #### initialisation de la grille : création et dessin d'une grille
+- #### affichage : affichage des pièces fixées, des carreaux dans le grille, etc  
+- #### paramètres et fonctions d'aide : fonctions secondaires utiles pour les boucles principales. Cela peut être des fonctions de calcul, de vérification des collisons, etc
+- #### boucle principale du jeu : boucle qui fait tourner le jeu et appelle les fonction secondaires et d'affichage. Dans l'IA, il y a une 2ème boucle, qui recommence une partie à chaque fin de jeu
+- #### game over (uniquement mode joueur) : affichage et gestion d'une fin de partie
 
 
 ### Contribution
