@@ -6,11 +6,10 @@ from tools import Button
 
 pygame.init()
 
+# Couleurs
 NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)
-GRIS = (193, 193, 193)
-BLEU = (0, 150, 255)
-BLEU_FONCE = (2, 25, 98)
+ORANGE = (255, 73, 1)
 ROUGE = (255, 0, 0)
 
 ecran = pygame.display.set_mode((800, 600))
@@ -37,7 +36,7 @@ clock = pygame.time.Clock()
 def show_menu(): 
 
     button_color = (ROUGE)
-    hover_color = (BLEU)
+    hover_color = (ORANGE)
     button_width, button_height = 200, 50
 
     start_x = ecran.get_width() / 2 - ecran.get_height() / 2
@@ -75,11 +74,11 @@ def show_menu():
         
         if ia_button.check_clicked (mouse_pos, mouse_clicked):
             running = False
-            tetris_ia()
+            tetris_ia.main()
 
         elif player_button.check_clicked (mouse_pos, mouse_clicked):
             running = False
-            tetris_j()
+            tetris_j.main()
 
         pygame.display.flip()
         clock.tick(30)

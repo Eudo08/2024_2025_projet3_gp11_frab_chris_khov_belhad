@@ -72,12 +72,31 @@ def init_grid():
     grid_centerX = (largeur / 2) - (h * grid_width) / 2
     grid_centerY = 0
 
+    largeur = 800
+    hauteur = 600
+    taille_bloc = 25
+    score = 0
+    font = pygame.font.Font("assets/font/Drawliner.ttf",30)
+    font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
+    grid = []
+    grid_height = 20
+    grid_width = 10
+    grid_cellsize = 0
     grid_cells = []
-    for i in range(grid_height):
-        row = []
-        for j in range(grid_width):
-            row.append(0)
-        grid_cells.append(row)
+    grid_centerX = 0
+    grid_centerY = 0
+    piece_pos_x = grid_width // 2 - 2
+    piece_pos_y = -1
+    gravity_time = 1
+    timerdrop = gravity_time
+    player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
+    
+    def init_grid():
+        global grid_cellsize, grid_cells, grid_centerX, grid_centerY
+        h = hauteur / grid_height
+        grid_cellsize = h
+        grid_centerX = (largeur / 2) - (h * grid_width) / 2
+        grid_centerY = 0
 
 
 def draw_grid():
@@ -121,6 +140,10 @@ def nouvelle_piece():
     piece_id = random.choice(list(pieces.tetros.keys()))
     rotation = 0
 
+    def nouvelle_piece():
+        global piece_id, rotation
+        piece_id = random.choice(list(pieces.tetros.keys()))
+        rotation = 0
 
 def dessiner_piece(piece_id, rotation, case_x, case_y):
     """
@@ -152,20 +175,24 @@ def next_drop(dt):
     timerdrop -= dt
     if timerdrop <= 0:
         piece = pieces.tetros[piece_id]["rotations"][rotation]
-        can_move = True
-
+        couleur = pieces.tetros[piece_id]["couleur"]
         for i in range(4):
             for j in range(4):
                 if piece[i][j]:
-                    new_y = piece_pos_y + i + 1
-                    new_x = piece_pos_x + j
-                    if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
-                        can_move = False
-                        break
-                  
-                        
-            if not can_move:
-                break
+                    x= grid_centerX + (case_x + j) * grid_cellsize
+                    y= grid_centerY + (case_y + i) * grid_cellsize
+                    pygame.draw.rect(fenetre, couleur, (x, y, grid_cellsize, grid_cellsize))
+                    pygame.draw.rect(fenetre, GRIS, (x, y, grid_cellsize, grid_cellsize), 1)
+
+
+
+    def next_drop(dt):
+        global timerdrop, piece_pos_y, piece_pos_x, score
+
+        timerdrop -= dt
+        if timerdrop <= 0:
+            piece = pieces.tetros[piece_id]["rotations"][rotation]
+            can_move = True
 
         if can_move:
             piece_pos_y += 1
@@ -173,13 +200,15 @@ def next_drop(dt):
             for i in range(4):
                 for j in range(4):
                     if piece[i][j]:
-                        grid_y = piece_pos_y + i
-                        grid_x = piece_pos_x + j
-                        if grid_y >= 0:
-                            grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
+                        new_y = piece_pos_y + i + 1
+                        new_x = piece_pos_x + j
+                        if new_y >= grid_height or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
+                            can_move = False
+                            break
                     
-            lignes_supprimees = supprimer_lignes()
-            score += lignes_supprimees * 100
+                            
+                if not can_move:
+                    break
 
             nouvelle_piece()
             piece_pos_x = grid_width // 2 - 2
@@ -329,7 +358,6 @@ while en_cours:
     score_text = font.render(f"score: {score}", True, BLANC)
     fenetre.blit(score_text, (10, 10))
     pygame.display.flip()
-    clock.tick(5)
 
 
 # ================================
