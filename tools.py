@@ -1,8 +1,13 @@
 import pygame
 
+# Couleur
 NOIR = (0, 0, 0)
 
+
 class Button: 
+    """
+    Classe représentant un bouton dans une interface graphique.
+    """
     def __init__(self, text, x, y, width, height, color, hover_color):
         self.text = text
         self.rect = pygame.Rect(x, y, width, height)

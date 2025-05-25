@@ -1,6 +1,11 @@
 tetros = {}
 
-# I
+
+"""
+Module pour définir les pièces du Tetris.
+Chaque pièce est représentée par un dictionnaire contenant les rotations possibles et la couleur associée.
+"""
+# I (ligne)
 tetros[1] = {
     "rotations": [
         [
@@ -19,7 +24,7 @@ tetros[1] = {
     "couleur": (202, 249, 244)
 }
 
-# O (carré)
+# II (carré)
 tetros[2] = {
     "rotations": [
         [
@@ -32,7 +37,7 @@ tetros[2] = {
     "couleur": (245, 249, 202)
 }
 
-# T
+# III (T)
 tetros[3] = {
     "rotations": [
         [
@@ -63,7 +68,7 @@ tetros[3] = {
     "couleur": (249, 202, 241)
 }
 
-# L
+# IV (L)
 tetros[4] = {
     "rotations": [
         [
@@ -94,7 +99,7 @@ tetros[4] = {
     "couleur": (249, 227, 202)
 }
 
-# J
+# V (J)
 tetros[5] = {
     "rotations": [
         [
@@ -125,7 +130,7 @@ tetros[5] = {
     "couleur": (216, 202, 249)
 }
 
-# S
+# VI (S)
 tetros[6] = {
     "rotations": [
         [
@@ -144,7 +149,7 @@ tetros[6] = {
     "couleur": (204, 249, 202)
 }
 
-# Z
+# VII (Z)
 tetros[7] = {
     "rotations": [
         [
