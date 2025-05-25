@@ -170,7 +170,6 @@ def next_drop(dt):
         if can_move:
             piece_pos_y += 1
         else:
-            # Fixer la pièce dans la grille
             for i in range(4):
                 for j in range(4):
                     if piece[i][j]:
@@ -182,7 +181,6 @@ def next_drop(dt):
             lignes_supprimees = supprimer_lignes()
             score += lignes_supprimees * 100
 
-            # Nouvelle pièce
             nouvelle_piece()
             piece_pos_x = grid_width // 2 - 2
             piece_pos_y = -1
@@ -217,7 +215,6 @@ def nouv_tetros():
                                 if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
                                     grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
 
-                    # Générer une nouvelle pièce
                     piece_pos_x = grid_width // 2 - 2
                     piece_pos_y = 0
                     nouvelle_piece()
@@ -256,7 +253,7 @@ origine_y = grid_centerY
 
 while en_cours:
     """
-    Boucle principale du jeu, gère les événements, le dessin de la grille,
+    Boucle principale du jeu, gère les événements, le dessin de la grille
     """
     for evenement in pygame.event.get():
         if evenement.type == pygame.QUIT:
