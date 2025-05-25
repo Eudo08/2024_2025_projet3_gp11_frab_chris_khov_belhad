@@ -61,9 +61,6 @@ python menu.py
 - #### game over (uniquement mode joueur)
 
 
-### Exemple
-
-
 ### Contribution
 
 **[Louise Christophe](https://github.com/louisechristophe), [Eudocie de Khovrine](https://github.com/Eudo08), [Marine Fraboulet](https://github.com/MAMARINEEE)**, [WaelBelhaddad](https://github.com/WaelBELHADDAD) : Développement et ajout des fonctionnalités, des validations et des conversions entre bases, ainsi que l'amélioration de la structure générale.  
