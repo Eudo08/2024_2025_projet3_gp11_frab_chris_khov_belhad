@@ -581,65 +581,11 @@
 import pygame
 import utils
 import copy
+import random
 import numpy as np
+import données_ia
 
-# ================================
-# INITIALISATION DE BASE
-# ================================
 
-pygame.init()
-
-# Fenêtre et grille
-largeur = 800
-hauteur = 600
-taille_bloc = 25
-grid_height = 20
-grid_width = 6
-fenetre = pygame.display.set_mode((largeur, hauteur))
-pygame.display.set_caption("Tetris")
-
-# Grille logique
-grid = []
-grid_cellsize = 0
-grid_cells = []
-grid_centerX = 0
-grid_centerY = 0
-
-# Position de la pièce
-piece_pos_x = grid_width // 2 - 2
-piece_pos_y = 0
-
-# Couleurs
-NOIR = (0, 0, 0)
-BLANC = (255, 255, 255)
-GRIS = (193, 193, 193)
-BLEU = (0, 150, 255)
-ROUGE = (255, 0, 0)
-
-# Polices
-font = pygame.font.Font("assets/font/Drawliner.ttf", 30)
-font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
-
-# Variables de jeu
-score = 0
-game_over = False
-lignes_supprimees = 0
-etat_id = 0
-rotation = 0
-piece_id = 2
-gravity_time = 200
-timerdrop = gravity_time
-player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
-
-# Hyperparamètres de l'IA
-epsilon = 0.1
-alpha = 0.2
-gamma = 0.99
-
-# Bordures / états
-dico_bordures = utils.charger_dico_json("bordures.json")
-if dico_bordures:
-    etat_id = max(map(int, dico_bordures.keys())) + 1
 
 # ================================
 # INITIALISATION DE LA GRILLE
@@ -771,10 +717,10 @@ class Q_Table():
         self.data[str(current)] = Q
         print(f"Ajout de l'état {current} avec Q-values: {Q}")
 
-    # def get_best(self,current):
-    #     if str(current) in self.data:
-    #         return self.data[str(current)].index(max(self.data[str(current)]))
-    #     return random.randint(0,5)
+    def get_best(self,current):
+        if str(current) in self.data:
+            return self.data[str(current)].index(max(self.data[str(current)]))
+        return random.randint(0,5)
 
     def save(self):
         print("Sauvegarde de la Q-table...")
@@ -827,8 +773,7 @@ while repeat:
                 table.data[str(current_id)] = Q
                 print (f"Action: {action}, Q-value: {Q[action]}")
 
-            if sum(scores) / len(scores) <= -1000:
-                game_over = True
+            
 
 
             
@@ -843,18 +788,24 @@ while repeat:
 
             score += max(scores)
 
+            if sum(scores) / len(scores) <= -1000:
+                game_over = True
+
             if any(cell != 0 for cell in grid_cells[0]):
                 game_over = True
 
             if game_over:
                 table.save()
+                en_cours = False
                 break
 
         else:
+
             previous_max = grid_height-next((i for i, sub in enumerate(grid_cells) if any(x != 0 for x in sub)), -1)
             results = get_possibles_grids(grid_cells)
             current_id = int(''.join(str(int(bool(x))) for sub in grid_cells for x in sub), 2)
             print(current_id)
+            print (Q := table.data.get(str(current_id), [0]*len(results)))
             new_move = table.get_best(current_id)
             grid_cells = results[new_move]
             grid_cells,num_deleted_lines = supprimer_lignes(grid_cells)
@@ -862,6 +813,13 @@ while repeat:
             new_id = int(''.join(str(int(bool(x))) for sub in grid_cells for x in sub), 2)
 
             score += calculer_recompense(False,num_deleted_lines,previous_max,new_max,False)
+            
+            if any(cell != 0 for cell in grid_cells[0]):
+                game_over = True
+
+            if game_over:
+                en_cours = False
+
 
         if training:
             table.add(current_id, Q)
@@ -879,4 +837,6 @@ while repeat:
         if evenement.type == pygame.QUIT:      
             if training:            # Si l'utilisateur ferme la fenêtre
                 table.save()
-            repeat = False # Quitte la boucle
+            en_cours = False
+            repeat = False
+            break # Quitte la boucle
