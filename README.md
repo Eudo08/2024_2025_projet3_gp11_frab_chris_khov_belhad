@@ -7,17 +7,20 @@ Plus le joueur rempli des lignes, plus il gagne des points.
 
 
 ### Description  
-Ce projet est un jeu tetris avec lequel l'IA va s'entrainer pour devenir plus efficace.
-Idée deep learning:
-S'entrainer sur des modeles: analyse des decisions de parties = retenir le placement du pixel
-coef associées aux actions
+Ce projet propose une implémentation du jeu Tetris, accompagnée d'une IA qui s'entraîne pour améliorer son efficacité dans le placement des pièces.
+
+Idée Deep Learning :
+L’IA analyse les décisions prises lors de multiples parties pour apprendre à choisir les placements optimaux. Elle attribue des coefficients aux actions (rotation, position) en fonction du résultat obtenu (lignes complétées, espace libre, etc.).
 
 
 ### Structure du Projet
-**main.py** :
-**game.py** :
-**utils.py** :
-**piece.py** : 
+**tetris_ia.py** : lancement du jeu (ia)
+**tetris_j.py** : lancement du jeu (joueur)
+**utils.py** : gestion du json
+**tools.py** : fonction boutton
+**menu.py** : lancement du menu permettant de choisir le mode de jeu
+**bordures.json** : 
+**pieces.py** : éfinition des pièces, rotations et couleurs
 
 
 ### Fonctionnalités
