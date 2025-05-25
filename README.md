@@ -14,17 +14,23 @@ L’IA analyse les décisions prises lors de multiples parties pour apprendre à
 
 
 ### Structure du Projet
-**tetris_ia.py** : lancement du jeu (ia) 
-**tetris_j.py** : lancement du jeu (joueur) 
-**utils.py** : gestion du json 
-**tools.py** : fonction boutton 
-**menu.py** : lancement du menu permettant de choisir le mode de jeu 
-**bordures.json** :  
-**pieces.py** : éfinition des pièces, rotations et couleurs 
+**tetris_ia.py** : lancement du jeu (ia)   
+**tetris_j.py** : lancement du jeu (joueur)    
+**utils.py** : gestion du json    
+**tools.py** : fonction boutton    
+**menu.py** : lancement du menu permettant de choisir le mode de jeu   
+**bordures.json** :    
+**pieces.py** : éfinition des pièces, rotations et couleurs   
 
 
 ### Fonctionnalités
-
+- Mode joueur humain 
+- Mode IA 
+- Système de score 
+- Affichage coloré des pièces 
+- Détection de lignes complètes et suppression 
+- Mouvements et rotations des pièces 
+- Entraînement et analyse de l’IA 
 
 ### Prérequis
 Python 3.x
@@ -42,16 +48,17 @@ cd 2024_2025_projet3_gp11_frab_chris_khov_belhad
 ### Utilisation
 1. Lancez le script :  
 ```
-python main.py
+python menu.py
 ```
 
 
-### Modules et fonctions
-#### main.py :
-
-#### piece.py :
-
-#### game.py :
+### Modules et fonctions 
+- #### Initialisation de base  
+- #### initialisation de la grille  
+- #### affichage   
+- #### paramètres et fonctions d'aide  
+- #### boucle principale du jeu
+- #### game over (uniquement mode joueur)
 
 
 ### Exemple
