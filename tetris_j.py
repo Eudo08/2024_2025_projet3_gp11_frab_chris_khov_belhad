@@ -241,34 +241,30 @@ def main():
 
                 
                     if grid_y >= grid_height or grid_x < 0 or grid_x >= grid_width:
-                        for k in range(4):
-                            for l in range(4):
-                                if piece[k][l]:
-                                    grid_y2 = piece_pos_y + k
-                                    grid_x2 = piece_pos_x + l
-                                    if 0 <= grid_y2 < grid_height and 0 <= grid_x2 < grid_width:
-                                        grid_cells[grid_y2][grid_x2] = pieces.tetros[piece_id]["couleur"]
-
+                        place_piece_in_grid(piece, piece_pos_y, piece_pos_x)
                         piece_pos_x = grid_width // 2 - 2
                         piece_pos_y = 0
                         nouvelle_piece()
                         return
                     
+                    if grid_y >= 0 and grid_cells[grid_y][grid_x] != 0:
+                       place_piece_in_grid(piece, piece_pos_y, piece_pos_x)
+                       piece_pos_x = grid_width // 2 - 2
+                       piece_pos_y = 0
+                       nouvelle_piece()
+                       return
+                    
+    def place_piece_in_grid(piece, pos_y, pos_x):
+        """
+        Place la pièce dans la grille en la verrouillant à sa position actuelle.
+        """
+        for i in range(4):
+            for j in range(4):
+                if piece[i][j]:
+                    grid_y = pos_y + i
+                    grid_x = pos_x + j
                     if 0 <= grid_y < grid_height and 0 <= grid_x < grid_width:
-                        if grid_cells[grid_y][grid_x] != 0:
-                            # Case occupée : collision
-                            for k in range(4):
-                                for l in range(4):
-                                    if piece[k][l]:
-                                        grid_y2 = piece_pos_y + k
-                                        grid_x2 = piece_pos_x + l
-                                        if 0 <= grid_y2 < grid_height and 0 <= grid_x2 < grid_width:
-                                            grid_cells[grid_y2][grid_x2] = pieces.tetros[piece_id]["couleur"]
-
-                            piece_pos_x = grid_width // 2 - 2
-                            piece_pos_y = 0
-                            nouvelle_piece()
-                            return
+                        grid_cells[grid_y][grid_x] = pieces.tetros[piece_id]["couleur"]
 
 
     def supprimer_lignes():
