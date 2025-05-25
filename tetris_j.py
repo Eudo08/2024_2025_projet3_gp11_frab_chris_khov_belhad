@@ -3,28 +3,69 @@ import random
 import pieces
 
 
-pygame.init()
 
+pygame.init()  # Initialisation de Pygame
+
+
+
+# ================================
+# INITIALISATION DE BASE
+# ================================
+
+
+# Fenêtre et grille
 largeur = 800
 hauteur = 600
-taille_bloc = 25
-score = 0
-font = pygame.font.Font("assets/font/Drawliner.ttf",30)
-font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
-grid = []
 grid_height = 20
 grid_width = 10
+taille_bloc = 25
 grid_cellsize = 0
 grid_cells = []
 grid_centerX = 0
 grid_centerY = 0
-piece_pos_x = grid_width // 2 - 2
-piece_pos_y = -1
+grid = []
+
+# Variables de jeu
+score = 0
+lignes_supprimees = 0
+en_cours = True
 gravity_time = 1
 timerdrop = gravity_time
+
+# Position de la pièce
+piece_pos_x = grid_width // 2 - 2
+piece_pos_y = -1
+rotation = 0
+piece_id = random.choice(list(pieces.tetros.keys()))
+
+# Couleurs
+NOIR = (0, 0, 0)
+BLANC = (255, 255, 255)
+GRIS = (193, 193, 193)
+BLEU = (0, 150, 255)
+
+# Polices
+font = pygame.font.Font("assets/font/Drawliner.ttf", 30)
+font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
+
+# Fenêtre et autres objets
+fenetre = pygame.display.set_mode((largeur, hauteur))
+pygame.display.set_caption("Tetris")
+clock = pygame.time.Clock()
 player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
 
+
+
+# ================================
+# INITIALISATION DE LA GRILLE
+# ================================
+
+
+
 def init_grid():
+    """
+    Initialise la grille de jeu avec des cellules vides.
+    """
     global grid_cellsize, grid_cells, grid_centerX, grid_centerY
     h = hauteur / grid_height
     grid_cellsize = h
@@ -38,7 +79,11 @@ def init_grid():
             row.append(0)
         grid_cells.append(row)
 
+
 def draw_grid():
+    """
+    Dessine la grille de jeu sur la fenêtre.
+    """
     h = grid_cellsize
     w = h
     for i in range(grid_height):
@@ -47,7 +92,11 @@ def draw_grid():
             y = grid_centerY + i * h
             pygame.draw.rect(fenetre, BLANC, (x, y, w, h), 1)
 
+
 def draw_locked_cells():
+    """
+    Dessine les cellules verrouillées de la grille.
+    """
     for i in range(grid_height):
         for j in range(grid_width):
             if grid_cells[i][j] != 0:
@@ -57,24 +106,26 @@ def draw_locked_cells():
                 pygame.draw.rect(fenetre, couleur, (x, y, grid_cellsize, grid_cellsize))
                 pygame.draw.rect(fenetre, GRIS, (x, y, grid_cellsize, grid_cellsize), 1)
 
-# Couleurs
-NOIR = (0, 0, 0)
-BLANC = (255, 255, 255)
-GRIS = (193, 193, 193)
-BLEU = (0, 150, 255)
 
-piece_id = random.choice(list(pieces.tetros.keys()))
-rotation = 0
+
+# ================================
+# INITIALISATION DES PIECES
+# ================================
+
 
 def nouvelle_piece():
+    """
+    Génère une nouvelle pièce aléatoire et réinitialise la rotation.
+    """
     global piece_id, rotation
     piece_id = random.choice(list(pieces.tetros.keys()))
     rotation = 0
 
 
-
-
 def dessiner_piece(piece_id, rotation, case_x, case_y):
+    """
+    Dessine la pièce actuelle sur la grille.
+    """
     piece = pieces.tetros[piece_id]["rotations"][rotation]
     couleur = pieces.tetros[piece_id]["couleur"]
     for i in range(4):
@@ -87,7 +138,15 @@ def dessiner_piece(piece_id, rotation, case_x, case_y):
 
 
 
+# ================================
+# FONCTIONS D'AIDE PRINCIPALES
+# ================================
+
+
 def next_drop(dt):
+    """
+    Gère la chute de la pièce actuelle en fonction du temps écoulé.
+    """
     global timerdrop, piece_pos_y, piece_pos_x, score
 
     timerdrop -= dt
@@ -131,8 +190,10 @@ def next_drop(dt):
         timerdrop = gravity_time
 
 
-
 def nouv_tetros():
+    """
+    Vérifie si la pièce actuelle peut être placée dans la grille.
+    """
     global piece_pos_x, piece_pos_y, grid_cells
 
     piece = pieces.tetros[piece_id]["rotations"][rotation]
@@ -162,8 +223,11 @@ def nouv_tetros():
                     nouvelle_piece()
                     return
 
-# comptage des points + suppression des lignes
+
 def supprimer_lignes():
+    """
+    Supprime les lignes complètes de la grille et renvoie le nombre de lignes supprimées.
+    """
     global grid_cells
     lignes_supprimees = 0
     i = grid_height - 1
@@ -177,18 +241,27 @@ def supprimer_lignes():
     return lignes_supprimees
 
 
-fenetre = pygame.display.set_mode((largeur, hauteur))
-pygame.display.set_caption("Tetris")
 
-en_cours = True
+# ================================
+# BOUCLE PRINCIPALE
+# ================================
+
+
+# Initialisation de la fenêtre et de la grille
 clock = pygame.time.Clock()
 init_grid()
 origine_x = grid_centerX
 origine_y = grid_centerY
+
+
 while en_cours:
+    """
+    Boucle principale du jeu, gère les événements, le dessin de la grille,
+    """
     for evenement in pygame.event.get():
         if evenement.type == pygame.QUIT:
             en_cours = False
+
         elif evenement.type == pygame.KEYDOWN:
             if evenement.key == pygame.K_SPACE:
                 new_rotation = (rotation + 1) % len(pieces.tetros[piece_id]["rotations"])
@@ -207,16 +280,20 @@ while en_cours:
                             elif y >= 0 and grid_cells[y][x] != 0:
                                 valide = False
                                 break 
+
                     if not valide:
                         break  
+
                 if valide:
                     rotation = new_rotation
 
             elif evenement.key == pygame.K_ESCAPE:
                 en_cours = False
+
             elif evenement.key == pygame.K_LEFT:
                 piece_pos_x -= 1
                 piece = pieces.tetros[piece_id]["rotations"][rotation]
+
                 for i in range(4):
                     for j in range(4):
                         if piece[i][j]:
@@ -225,9 +302,11 @@ while en_cours:
                             if new_x < 0 or (new_y >= 0 and grid_cells[new_y][new_x] != 0):
                                 piece_pos_x += 1  
                                 break
+
             elif evenement.key == pygame.K_RIGHT:
                 piece_pos_x += 1
                 piece = pieces.tetros[piece_id]["rotations"][rotation]
+
                 for i in range(4):
                     for j in range(4):
                         if piece[i][j]:
@@ -238,36 +317,16 @@ while en_cours:
                                 break
 
 
-            # elif evenement.key == pygame.K_LEFT:
-                
-            #     piece_pos_x -= 1
-            #     piece = pieces.tetros[piece_id]["rotations"][rotation] 
-            #     for i in range(4):
-            #         for j in range(4):
-            #             if piece[i][j]:  
-            #                 if piece_pos_x + j < 0: 
-            #                     piece_pos_x += 1  
-            #                     break
-            # elif evenement.key == pygame.K_RIGHT:
-            #     piece_pos_x += 1
-            #     piece = pieces.tetros[piece_id]["rotations"][rotation]
-            #     for i in range(4):
-            #         for j in range(4):
-            #             if piece[i][j]:  
-            #                 if piece_pos_x + j >= grid_width:  
-            #                     piece_pos_x -= 1  
-            #                     break
-
-
-    
-
+    # Dessin de la grille et des pièces
     fenetre.fill(NOIR)
     draw_grid()
 
+    # Dessiner la pièce actuelle
     nouv_tetros()
     draw_locked_cells()
     dessiner_piece(piece_id, rotation, piece_pos_x, piece_pos_y)
 
+    # Paramètres de jeu
     dt = clock.tick(30) 
     next_drop(dt)
     score_text = font.render(f"score: {score}", True, BLANC)
@@ -275,11 +334,19 @@ while en_cours:
     pygame.display.flip()
     clock.tick(5)
 
+
+# ================================
+# GAME OVER
+# ================================
+
+
+# Affichage du message de fin de jeu
 text_gameover = font2.render("Game over", True, BLANC)
 text_rect = text_gameover.get_rect(center=player_pos)
 fenetre.blit(text_gameover, text_rect)
 pygame.display.flip()
 
+# Attente de la fermeture de la fenêtre
 attente = True
 while attente:
     for event in pygame.event.get():
@@ -289,4 +356,3 @@ while attente:
 
 
 pygame.quit()
-pygame.quit ()

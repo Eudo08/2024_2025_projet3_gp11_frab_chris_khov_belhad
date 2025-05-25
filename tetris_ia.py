@@ -6,6 +6,10 @@ import numpy as np
 
 
 
+pygame.init() # Initialisation de Pygame
+
+
+
 # ================================
 # INITIALISATION DE BASE
 # ================================
@@ -55,15 +59,17 @@ player_pos = pygame.Vector2(largeur / 2, hauteur / 4)
 
 # Hyperparamètres de l'IA
 epsilon = 0.1
-alpha = 0.2
-gamma = 0.99
+alpha = 0.1
+gamma = 0.9
 
 # Bordures / états
 dico_bordures = utils.charger_dico_json("bordures.json")
 if dico_bordures:
     etat_id = max(map(int, dico_bordures.keys())) + 1
 
-
+# Choix de fonctionnement
+training = False  # Si True, l'IA s'entraîne ; si False, elle joue avec la Q-table
+repeat = True
 
 # ================================
 # INITIALISATION DE LA GRILLE
@@ -223,7 +229,6 @@ class Q_Table():
 
     def add(self,current,Q):
         self.data[str(current)] = Q
-        print(f"Ajout de l'état {current} avec Q-values: {Q}")
 
     def get_best(self,current):
         if str(current) in self.data:
@@ -231,17 +236,12 @@ class Q_Table():
         return random.randint(0,5)
 
     def save(self):
-        print("Sauvegarde de la Q-table...")
         utils.sauvegarder_dico_json(self.data, "bordures.json")
 
     def load(self):
         self.data = utils.charger_dico_json("bordures.json")
 table = Q_Table()
 
-
-# Initialisation de la boucle principale
-training = True
-repeat = True
 
 # Chargement de la Q-table si l'on n'est pas en mode entraînement
 if not training:
