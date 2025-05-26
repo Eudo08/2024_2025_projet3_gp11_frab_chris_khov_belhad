@@ -20,7 +20,7 @@ grid_centerY = 0
 
 score = 0
 en_cours = True
-gravity_time = 1
+gravity_time = 0.3
 timerdrop = gravity_time
 
 piece_pos_x = grid_width // 2 - 2
@@ -31,6 +31,7 @@ piece_id = random.choice(list(pieces.tetros.keys()))
 NOIR = (0, 0, 0)
 BLANC = (255, 255, 255)
 GRIS = (193, 193, 193)
+ROUGE = (255, 0, 0)
 
 font = pygame.font.Font("assets/font/Drawliner.ttf", 30)
 font2 = pygame.font.Font("assets/font/game_over.ttf", 50)
@@ -91,10 +92,17 @@ def next_drop(dt):
             piece_pos_y += 1
         else:
             place_piece_in_grid(piece, piece_pos_y, piece_pos_x)
+
+            if piece_pos_y < 0:
+                global en_cours
+                en_cours = False
+                return
+
             supprimer_lignes()
             piece_pos_x = grid_width // 2 - 2
             piece_pos_y = -1
             nouvelle_piece()
+
 
         timerdrop = gravity_time
 
@@ -232,7 +240,7 @@ def main():
         fenetre.blit(score_text, (10, 10))
         pygame.display.flip()
 
-    text_gameover = font2.render("Game over", True, BLANC)
+    text_gameover = font2.render("Game over", True, ROUGE)
     text_rect = text_gameover.get_rect(center=player_pos)
     fenetre.blit(text_gameover, text_rect)
     pygame.display.flip()
