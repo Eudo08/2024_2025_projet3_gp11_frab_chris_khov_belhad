@@ -204,6 +204,7 @@ def main():
 
                 elif evenement.key == pygame.K_ESCAPE:
                     en_cours = False
+                    pygame.quit()
 
                 elif evenement.key == pygame.K_LEFT:
                     piece_pos_x -= 1
