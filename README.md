@@ -12,6 +12,8 @@ Ce projet propose une implémentation du jeu Tetris, accompagnée d'une IA qui s
 Idée Deep Learning :
 L’IA analyse les décisions prises lors de multiples parties pour apprendre à choisir les placements optimaux. Elle attribue des coefficients aux actions (rotation, position) en fonction du résultat obtenu (lignes complétées, espace libre, etc.).
 
+### Présentation
+[cliquer ici](https://www.canva.com/design/DAGn4W1EWao/jRh-phVxX5fxsAXQkYQC_A/view?utm_content=DAGn4W1EWao&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=hdc2a565ab4)
 
 ### Structure du Projet
 **tetris_ia.py** : lancement du jeu (ia)   
