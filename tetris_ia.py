@@ -65,7 +65,7 @@ if dico_bordures:
     etat_id = max(map(int, dico_bordures.keys())) + 1
 
 # Choix de fonctionnement
-training = False  # Si True, l'IA s'entraîne ; si False, elle joue avec la Q-table
+training = False # Si True, l'IA s'entraîne ; si False, elle joue avec la Q-table
 repeat = True
 
 # ================================
@@ -239,11 +239,10 @@ def main():
             self.data = utils.charger_dico_json("bordures.json")
     table = Q_Table()
 
-
-    # Chargement de la Q-table si l'on n'est pas en mode entraînement
-    if not training:
+    # Chargement de la Q-table si le fichier existe (en training ou non)
+    import os
+    if os.path.exists("bordures.json"):
         table.load()
-
 
     # Recommencer le jeu indéfiniment
     global repeat
