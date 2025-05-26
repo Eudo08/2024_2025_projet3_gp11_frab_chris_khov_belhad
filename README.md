@@ -1,5 +1,5 @@
 # 2024_2025__p04_projet2_g11 
-Louise Christophe, Eudocie de Khovrine, Marine Fraboulet
+Louise Christophe, Eudocie de Khovrine, Marine Fraboulet, Wael Belhaddad
 
 ## Tetris
 Jeu ayant pour objectif de remplir des lignes; des formes géométiques descendent et le joueur doit les placer de façon à remplir l'espace le plus efficassement possible.
