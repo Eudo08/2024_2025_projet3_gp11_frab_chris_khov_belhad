@@ -40,8 +40,6 @@ def show_menu():
     hover_color = (ORANGE)
     button_width, button_height = 200, 50
 
-    start_x = ecran.get_width() / 2 - ecran.get_height() / 2
-
     ia_button = Button("IA", 450, 450, button_width, button_height, button_color, hover_color)
     player_button = Button ("Jouer !", 150, 450, button_width, button_height, button_color, hover_color)
 
