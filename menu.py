@@ -1,7 +1,7 @@
 import pygame
 import sys 
 import tetris_ia
-import tetris_jn
+import tetris_j
 from tools import Button
 
 pygame.init()
@@ -82,7 +82,7 @@ def show_menu():
 
         elif player_button.check_clicked (mouse_pos, mouse_clicked):
             running = False
-            tetris_jn.main()
+            tetris_j.main()
 
         pygame.display.flip()
         clock.tick(30)
