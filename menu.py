@@ -38,12 +38,10 @@ new_img_j = pygame.transform.scale(img_j, new_sise)
 player_pos = pygame.Vector2(ecran.get_width() / 2, ecran.get_height() / 4)
 
 
-# Fonction pour afficher le menu principal
 def show_menu(): 
-
-    # ================================
-    # AFFICHAGE
-    # ================================
+    """
+    Fonction pour afficher le menu principal du jeu Tetris.
+    """
 
     button_color = (ROUGE)
     hover_color = (ORANGE)
@@ -54,8 +52,11 @@ def show_menu():
 
     running = True
 
-    # Boucle principale du menu
+
     while running:
+        """
+        Boucle principale du menu qui gère l'affichage, les événements et les interactions.
+        """
         ecran.fill(NOIR)
 
         texte = font.render("TETRIS", True, BLANC) 
@@ -68,9 +69,6 @@ def show_menu():
         mouse_pos = pygame.mouse.get_pos ()
         mouse_clicked = False
 
-        # ================================
-        # BOUCLE PRINCIPALE DU JEU
-        # ================================
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
