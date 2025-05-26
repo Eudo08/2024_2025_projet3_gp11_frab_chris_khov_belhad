@@ -68,9 +68,9 @@ def show_menu():
         mouse_pos = pygame.mouse.get_pos ()
         mouse_clicked = False
 
-    # ================================
-    # BOUCLE PRINCIPALE DU JEU
-    # ================================
+        # ================================
+        # BOUCLE PRINCIPALE DU JEU
+        # ================================
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
