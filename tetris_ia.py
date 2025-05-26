@@ -264,6 +264,20 @@ def main():
 
             dt = clock.tick(1)           # Limite la boucle à 60 FPS et récupère le temps écoulé depuis le dernier tick
 
+            for evenement in pygame.event.get():
+                if evenement.type == pygame.QUIT:
+                    if training:
+                        table.save()
+                    en_cours = False
+                    repeat = False
+                    break
+                elif evenement.type == pygame.KEYDOWN:
+                    if evenement.key == pygame.K_ESCAPE:
+                        if training:
+                            table.save()
+                        en_cours = False
+                        repeat = False
+                        break
 
             # Comportement en cas d'entraînement
             if training:
@@ -359,6 +373,6 @@ def main():
                 en_cours = False
                 repeat = False       
                 break             
-
+    
 if __name__ == "__main__":
     main()
